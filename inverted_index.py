@@ -7,7 +7,7 @@ Claudius Korzen <korzen@cs.uni-freiburg.de>
 
 import math
 import re
-import sys
+import argparse
 import pickle
 
 
@@ -267,11 +267,17 @@ def main(file_name, b, k):
 
 if __name__ == "__main__":
     # Parse the command line arguments.
-    if len(sys.argv) < 2:
-        print(f"Usage: python3 {sys.argv[0]} <file> [<b>] [<k>]")
-        sys.exit()
-
-    file_name = sys.argv[1]
-    b = float(sys.argv[2]) if len(sys.argv) > 2 else None
-    k = float(sys.argv[3]) if len(sys.argv) > 3 else None
-    main(file_name, b, k)
+    parser = argparse.ArgumentParser(description="""Construct the inverted
+        index with BM25 scores from the given file. Save the inverted index
+        using 'pickle'.""")
+    # Positional arguments
+    parser.add_argument("file_name", type=str, help="""File to read from. The
+            expected format of the file is one document per line, in the format
+            <title>TAB<description>.""")
+    # Optional arguments
+    parser.add_argument("-b", "--b", type=float, default=0.75, help="""b value
+            for the BM25 scores (default: %(default)s)""")
+    parser.add_argument("-k", "--k", type=float, default=1.75, help="""k value
+            for the BM25 scores (default: %(default)s)""")
+    args = parser.parse_args()
+    main(args.file_name, args.b, args.k)

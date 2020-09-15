@@ -5,7 +5,7 @@ Claudius Korzen <korzen@cs.uni-freiburg.de>
 """
 
 import re
-import sys
+import argparse
 import pickle
 
 from inverted_index import InvertedIndex  # NOQA
@@ -161,16 +161,24 @@ def main(precomputed_file, benchmark_file):
 
     new_name = (benchmark_file.replace("input", "output")
                               .replace(".tsv", "_")) + "evaluation.pkl"
-    print(f"Saving evaluation as {new_name}.")
+    print(f"Saving evaluation data as {new_name}.")
     pickle.dump(measures, open(new_name, "wb"))
 
 
 if __name__ == "__main__":
     # Parse the command line arguments.
-    if len(sys.argv) < 3:
-        print(f"Usage: python3 {sys.argv[0]} <precomputed_file> <benchmark>")
-        sys.exit()
-
-    precomputed_file = sys.argv[1]
-    benchmark_file = sys.argv[2]
+    parser = argparse.ArgumentParser(description="""Evaluate an inverted index
+            against a benchmark. Compute the measures precision at 3, precision
+            at R and average precision. Save the data from the evaluation using
+            'pickle'.""")
+    parser.add_argument("precomputed_file", type=str, help="""'Pickle'-file
+            containing the precomputed inverted index. To generate such a file,
+            use 'inverted_index.py'.""")
+    parser.add_argument("benchmark_file", type=str, help="""File containing the
+            benchmark. The expected format of the file is one query per line,
+            with the ids of all documents relevant for that query, like:
+            <query>TAB<id1>WHITESPACE<id2>WHITESPACE<id3> ...""")
+    args = parser.parse_args()
+    precomputed_file = args.precomputed_file
+    benchmark_file = args.benchmark_file
     main(precomputed_file, benchmark_file)

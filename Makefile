@@ -33,9 +33,9 @@ clean:
 	rm -f *.pyc
 	rm -rf __pycache__
 
-## web		Build the webapp.
-web:
-	python3 webapp/webapp.py $(PRECOMP_EVAL)
+## webapp		Build the webapp.
+webapp:
+	python3 www/webapp.py $(PRECOMP_EVAL)
 
 ## query		Query the precomputed inverted index.
 query:

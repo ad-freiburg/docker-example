@@ -7,7 +7,7 @@ Claudius Korzen <korzen@cs.uni-freiburg.de>
 
 import re
 import readline  # NOQA
-import sys
+import argparse
 import pickle
 from inverted_index import InvertedIndex  # NOQA
 
@@ -37,9 +37,11 @@ def main(precomputed_file):
 
 if __name__ == "__main__":
     # Parse the command line arguments.
-    if len(sys.argv) != 2:
-        print(f"Usage: python3 {sys.argv[0]} <precomputed_ii_file>")
-        sys.exit()
+    parser = argparse.ArgumentParser(description="""Query a precomputed
+        inverted index.""")
+    parser.add_argument("precomputed_file", type=str, help="""'Pickle'-file
+        containing the precomputed inverted index. To generate such a file,
+        use 'inverted_index.py'.""")
+    args = parser.parse_args()
 
-    precomputed_file = sys.argv[1]
-    main(precomputed_file)
+    main(args.precomputed_file)
