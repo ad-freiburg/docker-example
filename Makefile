@@ -13,20 +13,12 @@ help: Makefile
 	@echo "Take a look at the README file for more detailed information."
 	@echo
 
-## all		Compile, test and run checkstyle.
-all: compile test checkstyle
-
-## compile		Compile files.
-compile:
-	@echo "Nothing to compile for Python"
-
-## test		Run doctests.
-test:
+## all		Test and run checkstyle.
+all:
 	$(TEST_CMD) *.py
-
-## checkstyle	Run checkstyle using flake8.
-checkstyle:
+	$(TEST_CMD) www/*.py
 	$(CHECKSTYLE_CMD) *.py
+	$(CHECKSTYLE_CMD) www/*.py
 
 ## clean		Remove auto-generated files.
 clean:
