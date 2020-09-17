@@ -255,7 +255,7 @@ class InvertedIndex:
 
 def main(file_name, b, k):
     # Create a new inverted index from the given file.
-    print("Creatinging index with BM25 scores from file '%s'." % file_name)
+    print("Creating index with BM25 scores from file '%s'." % file_name)
     ii = InvertedIndex()
     ii.read_from_file(file_name, b=b, k=k)
 
