@@ -38,9 +38,9 @@ def main(precomputed_file):
 if __name__ == "__main__":
     # Parse the command line arguments.
     parser = argparse.ArgumentParser(description="""Query a precomputed
-        inverted index.""")
-    parser.add_argument("precomputed_file", type=str, help="""'Pickle'-file
-        containing the precomputed inverted index. To generate such a file,
+        inverted index to find the most relavent hits.""")
+    parser.add_argument("precomputed_file", type=str, help="""Pickle file
+        containing a precomputed inverted index. To generate such a file,
         use 'inverted_index.py'.""")
     args = parser.parse_args()
 

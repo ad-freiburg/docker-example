@@ -170,9 +170,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""Evaluate an inverted index
             against a benchmark. Compute the measures precision at 3, precision
             at R and average precision. Save the data from the evaluation using
-            'pickle'.""")
-    parser.add_argument("precomputed_file", type=str, help="""'Pickle'-file
-            containing the precomputed inverted index. To generate such a file,
+            pickle.""")
+    parser.add_argument("precomputed_file", type=str, help="""Pickle file
+            containing a precomputed inverted index. To generate such a file,
             use 'inverted_index.py'.""")
     parser.add_argument("benchmark_file", type=str, help="""File containing the
             benchmark. The expected format of the file is one query per line,

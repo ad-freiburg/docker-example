@@ -269,7 +269,7 @@ if __name__ == "__main__":
     # Parse the command line arguments.
     parser = argparse.ArgumentParser(description="""Construct the inverted
         index with BM25 scores from the given file. Save the inverted index
-        using 'pickle'.""")
+        using pickle.""")
     # Positional arguments
     parser.add_argument("file_name", type=str, help="""File to read from. The
             expected format of the file is one document per line, in the format

@@ -1,8 +1,21 @@
 # Inverted Index
 
-Build, query and evaluate an inverted index.
-The following are short descriptions of what the important programs do. For
-more details, call each program with the '-h'-flag to get usage information.
+This project contains programs to constuct, query and evaluate an inverted index.
+
+An inverted list for a word is a sorted list of ids of records containing that word.
+An inverted index is a map from all words to their inverted list.
+We can use an inverted index to perform keyword search on a collection of text documents.
+If you want to get more familar and more bachground information about the topic,
+take a look at lectures 1 and 2 of the Information Retrieval lecture
+[here](https://ad-wiki.informatik.uni-freiburg.de/teaching/InformationRetrievalWS1920 "Information Retrieval")
+
+There are precomputed files available, since it might take a long time to compute some of them.
+The data available is based on a movies dataset from the lecture mentioned above.
+It contains 107,769 movies with title and description.
+
+What follows are short descriptions of what the available programs do, what
+files they require and output and which precomputed files are available to use.
+For more details, call each program with the '-h'-flag to get usage information.
 
 
 ## Build an Inverted Index
@@ -36,5 +49,5 @@ precision at 3, precision at R and average precision, use
 
 ## Build a webapp
 
-You can build a webapp that nicly outputs the evaluation, use
+You can build a webapp that nicly outputs the evaluation using
 [this program](www/webapp.py).
