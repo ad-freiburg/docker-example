@@ -5,7 +5,7 @@ This project contains programs to constuct, query and evaluate an inverted index
 An inverted list for a word is a sorted list of ids of records containing that word.
 An inverted index is a map from all words to their inverted list.
 We can use an inverted index to perform keyword search on a collection of text documents.
-If you want to get more familar and more bachground information about the topic,
+If you want to get more familar and more background information about the topic,
 take a look at lectures 1 and 2 of the Information Retrieval lecture
 [here](https://ad-wiki.informatik.uni-freiburg.de/teaching/InformationRetrievalWS1920 "Information Retrieval")
 
@@ -26,8 +26,8 @@ input file and save it in an output file using pickle.
 Be careful, since the program will overwrite an existing file with the same
 name!
 
-You can find a precomputed output file in the nfs folder
-(nfs/studentes/example-project)
+You can find a precomputed output file in the NFS folder
+(nfs/students/example-project)
 
 
 ## Query the Inverted Index
@@ -37,7 +37,7 @@ any amount of entered words, return movies whose description got the highest
 BM25 scores.
 
 To save time for building the inverted index, you can use the precomputed file
-in the nfs folder as an input.
+in the NFS folder as an input.
 
 
 ## Evaluate the Inverted Index
@@ -49,5 +49,5 @@ precision at 3, precision at R and average precision, use
 
 ## Build a webapp
 
-You can build a webapp that nicly outputs the evaluation using
+You can build a webapp that nicely outputs the evaluation using
 [this program](www/webapp.py).
