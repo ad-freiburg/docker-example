@@ -12,4 +12,3 @@ CMD ["/bin/bash", "--rcfile", "/bashrc"]
 
 # docker build -t docker-example .
 # docker run --rm -it -p 5000:5000 -v /nfs/students/example-project/input:/docker-example/input:ro -v /nfs/students/example-project/output:/docker-example/output:rw --name docker-example docker-example
-# wharfer build -t docker-example . && wharfer run --rm -it -p 5000:5000 -v /nfs/students/example-project/input:/docker-example/input:ro -v /nfs/students/example-project/output:/docker-example/output:rw --name docker-example docker-example

@@ -20,7 +20,7 @@ def home():
 
 if __name__ == "__main__":
     # Parse the command line arguments.
-    parser = argparse.ArgumentParser(description="""Build a webapp that nicly
+    parser = argparse.ArgumentParser(description="""Build a webapp that nicely
             presents the evaluation data.""")
     # Positional arguments
     parser.add_argument("evaluation_file", type=str, help="""Pickle file

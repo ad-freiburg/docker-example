@@ -22,7 +22,7 @@ index-help:
 	@echo "	Files produced:	output/movies_precomputed_ii.pkl"
 	@echo "	~Time: 		< 1 min (for 44MB file)"
 	@echo "For more usage information about 'inverted_index.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Build an Inverted Index' section in the README.md."
+	@echo "For more background information, look at the 'Creating an Inverted Index' section in the README.md."
 
 query:	##	Query the precomputed invertex index of the movies dataset.
 	python3 query_precomputed_ii.py $(PRECOMP_II)
@@ -34,7 +34,7 @@ query-help:
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		a few seconds to load the inverted index (~140MB)"
 	@echo "For more usage information about 'query_precomputed_ii.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Query the Inverted Index' section in the README.md."
+	@echo "For more background information, look at the 'Keyword search on the Inverted Index' section in the README.md."
 
 evaluate:##	Run an evaluation on the precomputed inverted index of the movies dataset and show results
 ##		in the console.
@@ -49,7 +49,7 @@ evaluate-help:
 	@echo "	Files produced:	output/movies-benchmark_evaluation.pkl"
 	@echo "	~Time: 		a few seconds to load the ii (~140MB) plus < 1 sec per query for most queries."
 	@echo "For more usage information about 'evaluate_inverted_index.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Evaluate the Inverted Index' section in the README.md."
+	@echo "For more background information, look at the 'Evaluating the Inverted Index' section in the README.md."
 
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
 	python3 www/webapp.py $(PRECOMP_EVAL)
@@ -61,7 +61,7 @@ webapp-help:
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		instant"
 	@echo "For more usage information about 'webapp.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Build a webapp' section in the README.md."
+	@echo "For more background information, look at the 'Building the webapp' section in the README.md."
 
 check:	#	Test and run checkstyle.
 	$(TEST_CMD) *.py
