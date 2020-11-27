@@ -22,13 +22,14 @@ For more details, call each program with the '-h'-flag to get usage information.
 
 [This program](inverted_index.py) will create an inverted index from a given input file and save it in an output file using pickle.
 It computes the BM25 scores as explained in [lecture 2](https://daphne.informatik.uni-freiburg.de/ws1920/InformationRetrieval/svn/public/slides/lecture-02.pdf), that is
-$$ BM25 score = tf^{*} \cdot \log_2 \left( \frac{N}{df} \right), $$
-where $$N$$ is the total number of documents, $$df$$ is the number of documents that contain a word and $$tf^{*} = \frac{tf \cdot \left(k + 1\right)}{k \cdot \left(1-b + \frac{b \cdot DL}{AVDL}\right) + tf}$$,
-where $$tf$$ is the term frequency, $$DL$$ is the document length and $$AVDL$$ is the average document length.
-$$k$$ and $$b$$ are parameters that can be chosen in the program.
+<img src="http://render.githubusercontent.com/render/math?math=tf^{*}\cdot\log_2\left(\frac{N}{df}\right)">,
+where `N` is the total number of documents, `df` is the number of documents that contain a word and
+<img src="http://render.githubusercontent.com/render/math?math=tf^{*}=\frac{tf\cdot\left(k+1\right)}{k\cdot\left(1-b+\frac{b\cdot DL}{AVDL}\right)+tf}">,
+where tf is the term frequency, DL is the document length and AVDL is the average document length.
+k and b are parameters that can be chosen in the program.
 Usage:
 
-'''python3 inverted_index.py [-b B] [-k K] file_name'''
+```python3 inverted_index.py [-b B] [-k K] file_name```
 
 The expected format of the file is one document per line, in the format <title>TAB<description>.
 The program will automatically save the inverted index using pickle.
