@@ -16,12 +16,40 @@ app = Flask(__name__)
 @app.route("/home")
 def home():
     user_input = request.args
-    details = None
+    params = {}
     if "details" in user_input:
-        details = user_input["details"]
+        query = user_input["details"]
+        params["query"] = query
+        relevant_ids = evaluation[query]["relevant_ids"]
+        num_relevant = len(relevant_ids)
+        result_ids = evaluation[query]["result_ids"]
+        res = []
+        other_relevant = []
+        for i in relevant_ids:
+            if i in result_ids:
+                # doc ids are 1-based
+                res.append([docs[i - 1], result_ids.index(i) + 1])
+            else:
+                other_relevant.append(docs[i - 1])
+        res.sort(key = lambda x: x[1])
+        params["relevant"] = relevant_ids
+        top_results = []
+        counter = 0
+        for i in result_ids[:100]:
+            if i in relevant_ids:
+                top_results.append([docs[i - 1], "green"])
+                counter += 1
+                if counter == num_relevant:
+                    break
+            else:
+                top_results.append([docs[i - 1], "red"])
+        params["top_results"] = top_results
+        params["res"] = res
+        params["other_relevant"] = other_relevant
+        params["num_relevant"] = num_relevant
     return render_template("index.html",
                            measures=measures,
-                           details=details)
+                           **params)
 
 
 if __name__ == "__main__":
@@ -36,11 +64,12 @@ if __name__ == "__main__":
  for the webapp; should be the container port you published to the docker host
  (default: %(default)s)""")
     args = parser.parse_args()
-    eva = pickle.load(open(args.eval_path, "rb"))
-    benchmark = eva["benchmark"]
-    measures = eva["measures"]
+    eva_file = pickle.load(open(args.eval_path, "rb"))
+    evaluation = eva_file["evaluation"]
+    measures = eva_file["measures"]
     # ii = pickle.load(open(args.ii_path, "rb"))
-    # docs = [item[0] for item in ii.docs]  # For translating ids into doc titles
+    # # For translating ids into doc titles:
+    # docs = [item[0] for item in ii.docs]
     docs = []
     with open(args.ii_path, "r", encoding="utf-8") as f:
         for line in f:

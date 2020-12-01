@@ -7,9 +7,6 @@
     <meta name="author" content="Theresa Klumpp">
     <meta name="contact" content="klumppt@cs.uni-freiburg.de">
     <title>Docker Example</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
     <link rel="stylesheet" href="../static/style.css">
   </head>
   <body>
@@ -18,8 +15,8 @@
     </div>
     <div id="pagebox">
       <p> This is the evaluation of the inverted index in the docker example.
-      Each line represents a query in the benchmrk.
-      To get more information about a query, click on the corresponding line in the overview table below.
+      Each line represents a query in the benchmark.
+      To get details about a query, click on it in the overview table below.
       </p>
       <table>
         <tr>
@@ -32,35 +29,81 @@
           {% if query != "mean" %}
             <tr>
 	      <td><a href="?details={{query}}" style="color: black; text-decoration: none;">{{ query }}</a></td>
-              <td>{{ "%0.3f" % measures[query][0] }}</td>
-              <td>{{ "%0.3f" % measures[query][1] }}</td>
-              <td>{{ "%0.3f" % measures[query][2] }}</td>
+              <td>{{ "%0.2f" % measures[query][0] }}</td>
+              <td>{{ "%0.2f" % measures[query][1] }}</td>
+              <td>{{ "%0.2f" % measures[query][2] }}</td>
             </tr>
           {% endif %}
         {% endfor %}
         <tr>
           <th>mean</th>
-          <th>{{ "%0.3f" % measures["mean"][0] }}</th>
-          <th>{{ "%0.3f" % measures["mean"][1] }}</th>
-          <th>{{ "%0.3f" % measures["mean"][2] }}</th>
+          <th>{{ "%0.2f" % measures["mean"][0] }}</th>
+          <th>{{ "%0.2f" % measures["mean"][1] }}</th>
+          <th>{{ "%0.2f" % measures["mean"][2] }}</th>
         </tr>
       </table>
     </div>
-    {% if details %}
+    {% if query %}
     <div id="detailsbox">
-      <h2>Query: {{details}}</h2>
-      <p>Total number of relevant movies:</p>
-      <table>
+
+      <h2>Query: {{ query }}</h2>
+      <p>Total number of relevant documents: {{ num_relevant }}</p>
+      <span><b>P@3</b> = {{ "%0.5f" % measures[query][0] }}, </span>
+      <span><b>P@R</b> = <b>P@{{ num_relevant }}</b> = {{ "%0.5f" % measures[query][1] }}, </span>
+      <span><b>AP</b> = {{ "%0.5f" % measures[query][2] }} </span>
+      <p>Click on any of the points below to show/hide...</p>
+
+      <h3 onclick="showHide('topRes')" style="cursor: pointer"> ...top documents in the result list</h3>
+      <div id="topRes" style="display: none">
+        <p>
+          <span style="color: green">Green</span>
+          documents are relevant and
+          <span style="color: red">Red</span>
+          documents are not.
+        </p>
+        <table>
+          <tr>
+            <th> </th>
+            <th> Document title </th>
+          </tr>
+          {% for title, color in top_results %}
+            <tr>
+              <td> {{ loop.index0 + 1 }} </td>
+              <td style="color: {{color}}">{{title}}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+      <h3 onclick="showHide('inList')" style="cursor: pointer">...relevant documents in the result list (total: {{res|length}})</h3>
+      <table id="inList" style="display: none">
         <tr>
-          <th>Results</th>
-          <th>Relevant?</th>
+          <th>Document title</th>
+          <th>Position in result</th>
         </tr>
+	{% for title, position in res %}
         <tr>
-          <td></td>
-          <td></td>
+	  <td>{{title}}</td>
+	  <td>{{position}}</td>
         </tr>
+	{% endfor %}
       </table>
+
+      {% if other_relevant %}
+        <h3 onclick="showHide('notInList')" style="cursor: pointer">...relevant documents <i>not</i> in the result list (total: {{other_relevant|length}})</h3>
+        <table id="notInList" style="display: none">
+          <tr>
+            <th>Document title</th>
+          </tr>
+          {% for title in other_relevant %}
+          <tr>
+            <td>{{title}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+
     </div>
     {% endif %}
   </body>
+  <script src="../static/main.js"></script>
 </html>
