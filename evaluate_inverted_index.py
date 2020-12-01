@@ -162,7 +162,8 @@ def main(precomputed_file, benchmark_file):
     new_name = (benchmark_file.replace("input", "output")
                               .replace(".tsv", "_")) + "evaluation.pkl"
     print(f"Saving evaluation data as {new_name}.")
-    pickle.dump(measures, open(new_name, "wb"))
+    pickle.dump({"benchmark": benchmark, "measures": measures},
+                open(new_name, "wb"))
 
 
 if __name__ == "__main__":

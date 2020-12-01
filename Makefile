@@ -52,7 +52,7 @@ evaluate-help:
 	@echo "For more background information, look at the 'Evaluating the Inverted Index' section in the README.md."
 
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
-	python3 www/webapp.py $(PRECOMP_EVAL)
+	python3 www/webapp.py input/movies.txt $(PRECOMP_EVAL)
 
 webapp-help:
 	@echo "About 'make webapp':"
