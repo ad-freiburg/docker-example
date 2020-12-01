@@ -25,3 +25,20 @@ td, th {
 tr:nth-child(even) {
   background-color: #DDDDDD;
 }
+
+.hideshow {
+  cursor: pointer;
+}
+
+a.hidelink {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover, .hideshow:hover {
+  opacity: 0.5;
+}
+
+a:active{
+  font-weight: bold;
+}

@@ -1,6 +1,9 @@
-# Inverted Index
+# Docker Example
 
-This project contains programs to constuct, query and evaluate an inverted index.
+This is a project to help you get to know [docker](https://www.docker.com/) better.
+You should also read our [reproducibility guidelines](https://ad-wiki.informatik.uni-freiburg.de/teaching/Reproducibility) to understand everything.
+
+The project contains programs to constuct, query and evaluate an inverted index.
 
 An inverted list for a word is a sorted list of ids of records containing that word.
 An inverted index is a map from all words to their inverted list.

@@ -19,32 +19,31 @@ def home():
     params = {}
     if "details" in user_input:
         query = user_input["details"]
-        params["query"] = query
         relevant_ids = evaluation[query]["relevant_ids"]
         num_relevant = len(relevant_ids)
         result_ids = evaluation[query]["result_ids"]
-        res = []
+        relevant_in_res = []
         other_relevant = []
         for i in relevant_ids:
             if i in result_ids:
                 # doc ids are 1-based
-                res.append([docs[i - 1], result_ids.index(i) + 1])
+                relevant_in_res.append((docs[i - 1], result_ids.index(i) + 1))
             else:
                 other_relevant.append(docs[i - 1])
-        res.sort(key = lambda x: x[1])
-        params["relevant"] = relevant_ids
+        relevant_in_res.sort(key = lambda x: x[1])
         top_results = []
         counter = 0
         for i in result_ids[:100]:
             if i in relevant_ids:
-                top_results.append([docs[i - 1], "green"])
+                top_results.append([docs[i - 1], "black"])
                 counter += 1
                 if counter == num_relevant:
                     break
             else:
                 top_results.append([docs[i - 1], "red"])
+        params["query"] = query
         params["top_results"] = top_results
-        params["res"] = res
+        params["relevant_in_res"] = relevant_in_res
         params["other_relevant"] = other_relevant
         params["num_relevant"] = num_relevant
     return render_template("index.html",

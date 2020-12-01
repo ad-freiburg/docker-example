@@ -8,6 +8,7 @@
     <meta name="contact" content="klumppt@cs.uni-freiburg.de">
     <title>Docker Example</title>
     <link rel="stylesheet" href="../static/style.css">
+    <script src="../static/main.js"></script>
   </head>
   <body>
     <div id="titlebox">
@@ -28,7 +29,7 @@
         {% for query in measures %}
           {% if query != "mean" %}
             <tr>
-	      <td><a href="?details={{query}}" style="color: black; text-decoration: none;">{{ query }}</a></td>
+	      <td><a href="?details={{query}}" class="hidelink">{{ query }}</a></td>
               <td>{{ "%0.2f" % measures[query][0] }}</td>
               <td>{{ "%0.2f" % measures[query][1] }}</td>
               <td>{{ "%0.2f" % measures[query][2] }}</td>
@@ -53,13 +54,12 @@
       <span><b>AP</b> = {{ "%0.5f" % measures[query][2] }} </span>
       <p>Click on any of the points below to show/hide...</p>
 
-      <h3 onclick="showHide('topRes')" style="cursor: pointer"> ...top documents in the result list</h3>
-      <div id="topRes" style="display: none">
+      <h3 onclick="showHide('topRes')" class="hideshow"> ...top documents in the result list</h3>
+      <div id="topRes" style="display: none;">
         <p>
-          <span style="color: green">Green</span>
-          documents are relevant and
-          <span style="color: red">Red</span>
-          documents are not.
+          Documents highlighted in
+          <span style="color: red">red</span>
+          are not relevant to the query according to the ground truth in the benchmark.
         </p>
         <table>
           <tr>
@@ -69,19 +69,19 @@
           {% for title, color in top_results %}
             <tr>
               <td> {{ loop.index0 + 1 }} </td>
-              <td style="color: {{color}}">{{title}}</td>
+              <td style="color: {{color}};">{{title}}</td>
             </tr>
           {% endfor %}
         </table>
       </div>
-      <h3 onclick="showHide('inList')" style="cursor: pointer">...relevant documents in the result list (total: {{res|length}})</h3>
+      <h3 onclick="showHide('inList')" class="hideshow">...relevant documents in the result list (total: {{relevant_in_res|length}})</h3>
       <div id="inList" style="display: none;">
         <table>
           <tr>
             <th>Document title</th>
             <th>Position in result</th>
           </tr>
-          {% for title, position in res %}
+          {% for title, position in relevant_in_res %}
           <tr>
             <td>{{title}}</td>
             <td>{{position}}</td>
@@ -91,7 +91,7 @@
       </div>
 
       {% if other_relevant %}
-        <h3 onclick="showHide('notInList')" style="cursor: pointer">...relevant documents <i>not</i> in the result list (total: {{other_relevant|length}})</h3>
+        <h3 onclick="showHide('notInList')" class="hideshow">...relevant documents <i>not</i> in the result list (total: {{other_relevant|length}})</h3>
         <div id="notInList" style="display: none;">
           <table>
             <tr>
@@ -109,5 +109,4 @@
     </div>
     {% endif %}
   </body>
-  <script src="../static/main.js"></script>
 </html>
