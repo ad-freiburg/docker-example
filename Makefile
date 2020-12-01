@@ -11,7 +11,7 @@ help: Makefile
 	@echo
 	@echo "For more information about each target, use 'make <target>-help' for any of the targets above."
 
-index:	##	Create the inverted index from the movies datasest.
+index:	##	Create the inverted index from the movies dataset.
 ##		Note: This has been done already and the corresponding output file is already available.
 	python3 inverted_index.py input/movies.txt -b 0.04 -k 0.7
 

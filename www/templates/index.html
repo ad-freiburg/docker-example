@@ -75,31 +75,35 @@
         </table>
       </div>
       <h3 onclick="showHide('inList')" style="cursor: pointer">...relevant documents in the result list (total: {{res|length}})</h3>
-      <table id="inList" style="display: none">
-        <tr>
-          <th>Document title</th>
-          <th>Position in result</th>
-        </tr>
-	{% for title, position in res %}
-        <tr>
-	  <td>{{title}}</td>
-	  <td>{{position}}</td>
-        </tr>
-	{% endfor %}
-      </table>
-
-      {% if other_relevant %}
-        <h3 onclick="showHide('notInList')" style="cursor: pointer">...relevant documents <i>not</i> in the result list (total: {{other_relevant|length}})</h3>
-        <table id="notInList" style="display: none">
+      <div id="inList" style="display: none;">
+        <table>
           <tr>
             <th>Document title</th>
+            <th>Position in result</th>
           </tr>
-          {% for title in other_relevant %}
+          {% for title, position in res %}
           <tr>
             <td>{{title}}</td>
+            <td>{{position}}</td>
           </tr>
           {% endfor %}
         </table>
+      </div>
+
+      {% if other_relevant %}
+        <h3 onclick="showHide('notInList')" style="cursor: pointer">...relevant documents <i>not</i> in the result list (total: {{other_relevant|length}})</h3>
+        <div id="notInList" style="display: none;">
+          <table>
+            <tr>
+              <th>Document title</th>
+            </tr>
+            {% for title in other_relevant %}
+            <tr>
+              <td>{{title}}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
       {% endif %}
 
     </div>
