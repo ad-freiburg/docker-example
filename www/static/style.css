@@ -1,0 +1,27 @@
+body {
+  background: #F3F3F3;
+  font-family: arial, sans-serif;
+}
+
+div#pagebox, div#titlebox, div#detailsbox{
+  background: white;
+  border: 1px solid #A0A0A0;
+  width: 66em;
+  padding: 1em 1em 0.6em;
+  margin: 0.5em auto 0.5em;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #A0A0A0;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #DDDDDD;
+}
