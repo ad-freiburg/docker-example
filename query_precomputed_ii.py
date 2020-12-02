@@ -3,6 +3,7 @@ Copyright 2017, University of Freiburg
 Chair of Algorithms and Data Structures.
 Hannah Bast <bast@cs.uni-freiburg.de>
 Claudius Korzen <korzen@cs.uni-freiburg.de>
+Theresa Klumpp <klumppt@cs.uni-freiburg.de>
 """
 
 import re
@@ -17,6 +18,10 @@ def main(precomputed_file):
     print("Reading from file '%s'." % precomputed_file)
     ii = pickle.load(open(precomputed_file, "rb"))
 
+    print("Query the inverted index to find the most relevant hits. Enter any "
+          "amount of keywords. Type 'num_res=<n>' to change the number of "
+          "results presented to you. Use ctrl+d to leave the program.")
+    k = 3  # number of results shown
     while True:
         try:
             # Ask the user for a keyword query.
@@ -25,6 +30,11 @@ def main(precomputed_file):
             print("\nBye!")
             break
 
+        m = re.match(r"num_res=([0-9]+)$", query)
+        if m:
+            k = int(m.group(1))
+            print(f"Changed the number of results shown to {k}.")
+            continue
         # Split the query into keywords.
         keywords = [x.lower().strip() for x in re.split("[^A-Za-z]+", query)]
 
@@ -32,7 +42,7 @@ def main(precomputed_file):
         postings = ii.process_query(keywords)
 
         # Render the output (with ANSI codes to highlight the keywords).
-        ii.render_output(postings, keywords)
+        ii.render_output(postings, keywords, k)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 Copyright 2017, University of Freiburg
 Chair of Algorithms and Data Structures.
 Claudius Korzen <korzen@cs.uni-freiburg.de>
+Theresa Klumpp <klumppt@cs.uni-freiburg.de>
 """
 
 import re
@@ -48,7 +49,7 @@ def evaluate(ii, benchmark, verbose=True):
           dict of the result ids (returned by the inverted index) and the
           relevant ids (ground truth)
     >>> ii = InvertedIndex()
-    >>> ii.read_from_file("example.txt", b=0.75, k=1.75)
+    >>> ii.read_from_file("example.tsv", b=0.75, k=1.75)
     >>> benchmark = read_benchmark("example-benchmark.tsv")
     >>> measures, evaluation = evaluate(ii, benchmark, verbose=False)
     >>> [round(x, 3) for x in measures["mean"]]

@@ -3,6 +3,7 @@ Copyright 2017, University of Freiburg
 Chair of Algorithms and Data Structures.
 Hannah Bast <bast@cs.uni-freiburg.de>
 Claudius Korzen <korzen@cs.uni-freiburg.de>
+Theresa Klumpp <klumppt@cs.uni-freiburg.de>
 """
 
 import math
@@ -53,7 +54,7 @@ class InvertedIndex:
         that you ignore empty words.
 
         >>> ii = InvertedIndex()
-        >>> ii.read_from_file("example.txt", b=0, k=float("inf"))
+        >>> ii.read_from_file("example.tsv", b=0, k=float("inf"))
         >>> inv_lists = sorted(ii.inverted_lists.items())
         >>> [(w, [(i, '%.3f' % tf) for i, tf in l]) for w, l in inv_lists]
         ... # doctest: +NORMALIZE_WHITESPACE
@@ -65,7 +66,7 @@ class InvertedIndex:
          ('short', [(3, '1.000'), (4, '2.000')])]
 
         >>> ii = InvertedIndex()
-        >>> ii.read_from_file("example.txt", b=0.75, k=1.75)
+        >>> ii.read_from_file("example.tsv", b=0.75, k=1.75)
         >>> inv_lists = sorted(ii.inverted_lists.items())
         >>> [(w, [(i, '%.3f' % tf) for i, tf in l]) for w, l in inv_lists]
         ... # doctest: +NORMALIZE_WHITESPACE
@@ -260,7 +261,7 @@ def main(file_name, b, k):
     ii.read_from_file(file_name, b=b, k=k)
 
     new_name = (file_name.replace("input", "output")
-                         .replace(".txt", "_")) + "precomputed_ii.pkl"
+                         .replace(".tsv", "_")) + "precomputed_ii.pkl"
     print("Saving index as '%s'." % new_name)
     pickle.dump(ii, open(new_name, "wb"))
 

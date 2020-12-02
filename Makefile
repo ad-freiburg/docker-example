@@ -5,20 +5,21 @@ PRECOMP_II = output/movies_precomputed_ii.pkl
 PRECOMP_EVAL = output/movies-benchmark_evaluation.pkl
 
 help: Makefile
-	@echo "Please use 'make <target>', where <target> is one of the following:"
+	@echo "You are most likely to be interested in using 'make <target>', where <target> is one of the following:"
 	@echo
 	@grep "##" $< | grep -v 'grep' | sed 's/##//'
 	@echo
 	@echo "For more information about each target, use 'make <target>-help' for any of the targets above."
+	@echo "To get a full list of targets, you can use the autocompletion, i.e. type 'make ' and enter TAB."
 
 index:	##	Create the inverted index from the movies dataset.
 ##		Note: This has been done already and the corresponding output file is already available.
-	python3 inverted_index.py input/movies.txt -b 0.04 -k 0.7
+	python3 inverted_index.py input/movies.tsv -b 0.04 -k 0.7
 
 index-help:
 	@echo "About 'make index':"
 	@echo "	Calls:		inverted_index.py"
-	@echo "	Files read:	input/movies.txt"
+	@echo "	Files read:	input/movies.tsv"
 	@echo "	Files produced:	output/movies_precomputed_ii.pkl"
 	@echo "	~Time: 		< 1 min (for 44MB file)"
 	@echo "For more usage information about 'inverted_index.py', call it with the '-h' flag."
@@ -52,7 +53,7 @@ evaluate-help:
 	@echo "For more background information, look at the 'Evaluating the Inverted Index' section in the README.md."
 
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
-	python3 www/webapp.py input/movies.txt $(PRECOMP_EVAL)
+	python3 www/webapp.py input/movies.tsv $(PRECOMP_EVAL)
 
 webapp-help:
 	@echo "About 'make webapp':"

@@ -31,14 +31,14 @@ For more details, call each program with the '-h'-flag to get usage information.
 The program 'inverted_index.py' will create an inverted index from a given input file and save it in an output file using pickle.
 It computes the BM25 scores for each word and document, that is 
 	BM25 = tf * (k+1) / (k * (1 - b + b * DL/AVDL) + tf) * log2(N/df),
-where tf is the term freqiemcy, DL is the document length, AVDL is the average document length, N is the total number of documents and df is the number of documents that contain the word.
+where tf is the term frequency, DL is the document length, AVDL is the average document length, N is the total number of documents and df is the number of documents that contain the word.
 Moreover, k and b are parameters to be chosen.
 You can find more background information about the BM25 scores in [lecture 2](https://daphne.informatik.uni-freiburg.de/ws1920/InformationRetrieval/svn/public/slides/lecture-02.pdf) of the Information Retrieval lecture.
 
 Usage: `python3 inverted_index.py [-b B] [-k K] file_name`
 
 The expected format of the input file is one document per line, in the format \<title\>TAB\<description\>.
-A file 'movies.txt' in the expected format is available in '/nfs/students/example-project/input'.
+A file 'movies.tsv' in the expected format is available in '/nfs/students/example-project/input'.
 It contains 107.769 movies with title and description.
 The input b and k are the parameters mentioned in the formula above (default: b=0.75, k=1.75).
 The program will automatically save the inverted index using pickle.

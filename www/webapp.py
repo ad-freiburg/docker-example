@@ -30,7 +30,7 @@ def home():
                 relevant_in_res.append((docs[i - 1], result_ids.index(i) + 1))
             else:
                 other_relevant.append(docs[i - 1])
-        relevant_in_res.sort(key = lambda x: x[1])
+        relevant_in_res.sort(key=lambda x: x[1])
         top_results = []
         counter = 0
         for i in result_ids[:100]:
