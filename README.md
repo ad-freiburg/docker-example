@@ -10,7 +10,7 @@ Use the following commands (you can also find them at the end of the [Dockerfile
 
 ```
 docker build -t docker-example .
-docker run --rm -it -p 5000:5000 -v /nfs/students/example-project/input:/docker-example/input:ro -v /nfs/students/example-project/output:/docker-example/output:rw --name docker-example docker-example
+docker run --rm -it -p 5000:5000 -v /nfs/students/example-project/input:/docker-example/input:ro -v /nfs/students/example-project/output:/docker-example/output:rw -v $(pwd)/.docker_bash_history:/root/.bash_history --name docker-example docker-example
 ```
 
 ## Features
@@ -22,8 +22,8 @@ Here is a list of tips and features you can learn in this example on top of the 
     However, with the python parent image, many features like `bash-completion` have to be installed manually, if we desire to use them.
     Even though ubuntu or python are probably well suited for your project at our chair, [here](https://hub.docker.com/search?q=&type=image&image_filter=official) is a list of official images you can use.
   + To make a port available to services outside of Docker, we can use the `-p` flag.
-    The command `-p <host_port>:<container_port>` publishes `<container_port>` to the outside world and maps it to <host_port> on your machine.
-    In a nutshell: Anything you now run on <container_port> inside the docker container is available on <host_port> outside of Docker.
+    The command `-p <host_port>:<container_port>` publishes `<container_port>` to the outside world and maps it to `<host_port>` on your machine.
+    In a nutshell: Anything you now run on `<container_port>` inside the docker container is available on `<host_port>` outside of Docker.
   + The fact that Docker forgets your history of commands every time you start/stop a container, can be quiet annoying.
     With a simple trick that you can see in this example, you can make docker remember your bash history.
     Create an empty file `.docker_bash_history` and mount it to `/root/.bash_history` with the -v flag.
@@ -33,10 +33,10 @@ Here is a list of tips and features you can learn in this example on top of the 
   + Note that when running keyword search with 'query.py', you can get your last query by entering the Up key.
     A simple `import readline` enables this history-feature.
     This is very useful in many applications.
-  + Use `# NOQA` after the import to prevent flake8 to return an 'imported but unused' message.
+  + In cases like the `import readline`, use `# NOQA` after the import to prevent flake8 to return an 'imported but unused' message.
 + Other
   + We can use `##` with `grep` and `sed` in the [Makefile](Makefile) to print the help message.
-    This means the help message for a target can be located with the target itself, which makes it easier to keep track of the help message when targets are added, changed or deleted.
+    This means the help message for a target can be located with the target itself, which makes it easier to keep track of the help messages when targets are added, changed or deleted.
 
 If you have any questions about docker, use our [Docker Forum](https://daphne.informatik.uni-freiburg.de/forum/viewforum.php?f=1083).
 
