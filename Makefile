@@ -9,14 +9,14 @@ help: Makefile
 	@echo
 	@grep "##" $< | grep -v 'grep' | sed 's/##//'
 	@echo
-	@echo "For more information about each target, use 'make <target>-help' for any of the targets above."
+	@echo "For more information about each target, use 'make help-<target>' for any of the targets above."
 	@echo "To get a full list of targets, you can use the autocompletion, i.e. type 'make ' and enter TAB."
 
 index:	##	Create the inverted index from the movies dataset.
 ##		Note: This has been done already and the corresponding output file is already available.
 	python3 inverted_index.py input/movies.tsv -b 0.04 -k 0.7
 
-index-help:
+help-index:
 	@echo "About 'make index':"
 	@echo "	Calls:		inverted_index.py"
 	@echo "	Files read:	input/movies.tsv"
@@ -26,11 +26,11 @@ index-help:
 	@echo "For more background information, look at the 'Creating an Inverted Index' section in the README.md."
 
 query:	##	Query the precomputed invertex index of the movies dataset.
-	python3 query_precomputed_ii.py $(PRECOMP_II)
+	python3 query.py $(PRECOMP_II)
 
-query-help:
+help-query:
 	@echo "About 'make query':"
-	@echo "	Calls:		query_precomputed_ii.py"
+	@echo "	Calls:		query.py"
 	@echo "	Files read: 	output/movies_precomputed_ii.pkl"
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		a few seconds to load the inverted index (~140MB)"
@@ -41,9 +41,9 @@ evaluate:##	Run an evaluation on the precomputed inverted index of the movies da
 ##		in the console.
 ##		Note: The produced file is already available and a better representation of the evaluation
 ##		is available through the webapp.
-	python3 evaluate_inverted_index.py $(PRECOMP_II) $(BENCHMARK)
+	python3 evaluate.py $(PRECOMP_II) $(BENCHMARK)
 
-evaluate-help:
+help-evaluate:
 	@echo "About 'make evaluate':"
 	@echo "	Calls:		evaluate_inverted_index.py"
 	@echo "	Files read: 	output/movies_precomputed_ii.pkl, input/movies-benchmark.tsv"
@@ -55,7 +55,7 @@ evaluate-help:
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
 	python3 www/webapp.py input/movies.tsv $(PRECOMP_EVAL)
 
-webapp-help:
+help-webapp:
 	@echo "About 'make webapp':"
 	@echo "	Calls:		www/webapp.py"
 	@echo "	Files read: 	output/movies-benchmark_evaluation.pkl"
