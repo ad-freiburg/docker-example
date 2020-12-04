@@ -10,7 +10,7 @@ Use the following commands (you can also find them at the end of the [Dockerfile
 
 ```
 docker build -t docker-example .
-docker run --rm -it -p 5000:5000 -v /nfs/students/example-project/input:/docker-example/input:ro -v /nfs/students/example-project/output:/docker-example/output:rw -v $(pwd)/.docker_bash_history:/root/.bash_history --name docker-example docker-example
+docker run --rm -it -p 5000:5000 -v /nfs/students/docker-example/input:/docker-example/input:ro -v /nfs/students/docker-example/output:/docker-example/output:rw -v $(pwd)/.docker_bash_history:/root/.bash_history --name docker-example docker-example
 ```
 
 ## Features
@@ -66,7 +66,7 @@ You can find more background information about the BM25 scores in [lecture 2](ht
 Usage: `python3 inverted_index.py [-b B] [-k K] file_name`
 
 The expected format of the input file is one document per line, in the format \<title\>TAB\<description\>.
-A file 'movies.tsv' in the expected format is available in '/nfs/students/example-project/input'.
+A file 'movies.tsv' in the expected format is available in '/nfs/students/docker-example/input'.
 It contains 107.769 movies with title and description.
 The input b and k are the parameters mentioned in the formula above (default: b=0.75, k=1.75).
 The program will automatically save the inverted index using pickle.
@@ -101,7 +101,7 @@ For the movies dataset, this file has already been precomputed and is available 
 The second input 'benchmark_file' is the file containing the benchmark.
 The expected format of this file is one query per line, with the ids of all documents relevant for that query, like:
 \<query\>TAB\<id1\>WHITESPACE\<id2\>WHITESPACE\<id3\> ...
-A file 'movies-benchmark.tsv' in the expected format is available in '/nfs/students/example-project/input'.
+A file 'movies-benchmark.tsv' in the expected format is available in '/nfs/students/docker-example/input'.
 It is suitable for the movies dataset and contains 12 queries.
 The program automatically saves the data of the evaluation using pickle.
 The output file will have the same base name as the benchmark file, appended by 'evaluation.pkl'.
