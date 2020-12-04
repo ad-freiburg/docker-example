@@ -272,7 +272,7 @@ if __name__ == "__main__":
         index with BM25 scores from the given file. Save the inverted index
         using pickle.""")
     # Positional arguments
-    parser.add_argument("file_name", type=str, help="""File to read from. The
+    parser.add_argument("doc_file", type=str, help="""File to read from. The
             expected format of the file is one document per line, in the format
             <title>TAB<description>.""")
     # Optional arguments
@@ -281,4 +281,4 @@ if __name__ == "__main__":
     parser.add_argument("-k", "--k", type=float, default=1.75, help="""k value
             for the BM25 scores (default: %(default)s)""")
     args = parser.parse_args()
-    main(args.file_name, args.b, args.k)
+    main(args.doc_file, args.b, args.k)

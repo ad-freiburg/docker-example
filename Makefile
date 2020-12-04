@@ -18,24 +18,24 @@ index:	##	Create the inverted index from the movies dataset.
 
 help-index:
 	@echo "About 'make index':"
-	@echo "	Calls:		inverted_index.py"
+	@echo "	Uses:		inverted_index.py"
 	@echo "	Files read:	input/movies.tsv"
 	@echo "	Files produced:	output/movies_precomputed_ii.pkl"
 	@echo "	~Time: 		< 1 min (for 44MB file)"
 	@echo "For more usage information about 'inverted_index.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Creating an Inverted Index' section in the README.md."
+	@echo "For more background information (in particular file formats), look at the section 'Creating an Inverted Index' in the README.md."
 
 query:	##	Query the precomputed invertex index of the movies dataset.
 	python3 query.py $(PRECOMP_II)
 
 help-query:
 	@echo "About 'make query':"
-	@echo "	Calls:		query.py"
+	@echo "	Uses:		query.py"
 	@echo "	Files read: 	output/movies_precomputed_ii.pkl"
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		a few seconds to load the inverted index (~140MB)"
-	@echo "For more usage information about 'query_precomputed_ii.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Keyword search on the Inverted Index' section in the README.md."
+	@echo "For more usage information about 'query.py', call it with the '-h' flag."
+	@echo "For more background information (in particular file formats), look at the section 'Keyword search on the Inverted Index' in the README.md."
 
 evaluate:##	Run an evaluation on the precomputed inverted index of the movies dataset and show results
 ##		in the console.
@@ -45,24 +45,24 @@ evaluate:##	Run an evaluation on the precomputed inverted index of the movies da
 
 help-evaluate:
 	@echo "About 'make evaluate':"
-	@echo "	Calls:		evaluate_inverted_index.py"
+	@echo "	Uses:		evaluate.py"
 	@echo "	Files read: 	output/movies_precomputed_ii.pkl, input/movies-benchmark.tsv"
 	@echo "	Files produced:	output/movies-benchmark_evaluation.pkl"
 	@echo "	~Time: 		a few seconds to load the ii (~140MB) plus < 1 sec per query for most queries."
-	@echo "For more usage information about 'evaluate_inverted_index.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Evaluating the Inverted Index' section in the README.md."
+	@echo "For more usage information about 'evaluate.py', call it with the '-h' flag."
+	@echo "For more background information (in particular file formats), look at the section 'Evaluating the Inverted Index' in the README.md."
 
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
 	python3 www/webapp.py input/movies.tsv $(PRECOMP_EVAL)
 
 help-webapp:
 	@echo "About 'make webapp':"
-	@echo "	Calls:		www/webapp.py"
+	@echo "	Uses:		www/webapp.py"
 	@echo "	Files read: 	output/movies-benchmark_evaluation.pkl"
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		instant"
 	@echo "For more usage information about 'webapp.py', call it with the '-h' flag."
-	@echo "For more background information, look at the 'Building the webapp' section in the README.md."
+	@echo "For more background information (in particular file formats), look at the section 'Building the webapp' in the README.md."
 
 check:	#	Test and run checkstyle.
 	$(TEST_CMD) *.py

@@ -56,21 +56,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""Build a webapp that nicely
             presents the evaluation data.""")
     # Positional arguments
-    parser.add_argument("ii_path", type=str)
-    parser.add_argument("eval_path", type=str)
+    parser.add_argument("doc_file", type=str)
+    parser.add_argument("evaluation_file", type=str)
     # Optional arguments
     parser.add_argument("-p", "--port", type=int, default=5000, help="""Port
  for the webapp; should be the container port you published to the docker host
  (default: %(default)s)""")
     args = parser.parse_args()
-    eva_file = pickle.load(open(args.eval_path, "rb"))
+    eva_file = pickle.load(open(args.evaluation_file, "rb"))
     evaluation = eva_file["evaluation"]
     measures = eva_file["measures"]
-    # ii = pickle.load(open(args.ii_path, "rb"))
-    # # For translating ids into doc titles:
-    # docs = [item[0] for item in ii.docs]
     docs = []
-    with open(args.ii_path, "r", encoding="utf-8") as f:
+    with open(args.doc_file, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             docs.append(line.split("\t")[0])
