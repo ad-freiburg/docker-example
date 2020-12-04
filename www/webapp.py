@@ -56,8 +56,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""Build a webapp that nicely
             presents the evaluation data.""")
     # Positional arguments
-    parser.add_argument("doc_file", type=str)
-    parser.add_argument("evaluation_file", type=str)
+    parser.add_argument("doc_file", type=str, help="""File containing the
+            documents. The expected format of the file is one document per
+            line, in the format <title>TAB<description>.""")
+    parser.add_argument("evaluation_file", type=str, help="""Pickle file
+            containing an evaluation. To generate such a file, use
+            'evaluate.py'""")
     # Optional arguments
     parser.add_argument("-p", "--port", type=int, default=5000, help="""Port
  for the webapp; should be the container port you published to the docker host
