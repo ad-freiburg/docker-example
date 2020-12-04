@@ -49,7 +49,7 @@ def evaluate(ii, benchmark, verbose=True):
           dict of the result ids (returned by the inverted index) and the
           relevant ids (ground truth)
     >>> ii = InvertedIndex()
-    >>> ii.read_from_file("example.tsv", b=0.75, k=1.75)
+    >>> ii.read_from_file("example.tsv", b=0.75, k=1.75, verbose=False)
     >>> benchmark = read_benchmark("example-benchmark.tsv")
     >>> measures, evaluation = evaluate(ii, benchmark, verbose=False)
     >>> [round(x, 3) for x in measures["mean"]]

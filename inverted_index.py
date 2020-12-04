@@ -29,7 +29,7 @@ class InvertedIndex:
         self.docs = []  # The docs, each in form (title, description).
         self.doc_lengths = []  # The document lengths (= number of words).
 
-    def read_from_file(self, file_name, b=None, k=None):
+    def read_from_file(self, file_name, b=None, k=None, verbose=True):
         """
         Construct the inverted index from the given file. The expected format
         of the file is one document per line, in the format
@@ -54,7 +54,10 @@ class InvertedIndex:
         that you ignore empty words.
 
         >>> ii = InvertedIndex()
-        >>> ii.read_from_file("example.tsv", b=0, k=float("inf"))
+        >>> ii.read_from_file("example.tsv",
+        ...                   b=0,
+        ...                   k=float("inf"),
+        ...                   verbose=False)
         >>> inv_lists = sorted(ii.inverted_lists.items())
         >>> [(w, [(i, '%.3f' % tf) for i, tf in l]) for w, l in inv_lists]
         ... # doctest: +NORMALIZE_WHITESPACE
@@ -66,7 +69,7 @@ class InvertedIndex:
          ('short', [(3, '1.000'), (4, '2.000')])]
 
         >>> ii = InvertedIndex()
-        >>> ii.read_from_file("example.tsv", b=0.75, k=1.75)
+        >>> ii.read_from_file("example.tsv", b=0.75, k=1.75, verbose=False)
         >>> inv_lists = sorted(ii.inverted_lists.items())
         >>> [(w, [(i, '%.3f' % tf) for i, tf in l]) for w, l in inv_lists]
         ... # doctest: +NORMALIZE_WHITESPACE
@@ -120,8 +123,17 @@ class InvertedIndex:
                 # Register the document length.
                 self.doc_lengths.append(dl)
 
+                if verbose:
+                    if doc_id % 1000 == 0:
+                        print(f"Progress: Read {doc_id:6} documents.",
+                              end="\r")
+
         # Compute N (the total number of documents).
         n = len(self.docs)
+
+        if verbose:
+            print(f"Progress: Read {n:6} documents.")
+
         # Compute AVDL (the average document length).
         avdl = sum(self.doc_lengths) / n
 
