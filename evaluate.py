@@ -40,29 +40,28 @@ def evaluate(ii, benchmark, verbose=True):
     follows. Process each query in the benchmark with the given inverted
     index and compare the result list with the groundtruth in the
     benchmark. For each query, compute and print (if verbose=True) the
-    measure P@3, P@R and AP.
-    Return
-      i)  a dictionary with the measures (P@3, P@R and AP) for each query
-          in the benchmark and one entry for the aggregated mean of each
-          measure.
-      ii) a dictionary with one entry per query. Each entry contains a
-          dict of the result ids (returned by the inverted index) and the
-          relevant ids (ground truth)
+    measure P@3, P@R and AP as well as mean P@3, mean P@R and mean AP.
+    Return a dictionary with one entry for each query and one entry for the
+    mean. The keys are the keywords of the query (or "mean" for the mean) and
+    values are dictionaries with an entry "precision", which contains lists of
+    the measures. The dictionaries for the queries also contain the keys
+    "result_ids" (where the value is a list of document ids with the results
+    returned by the inverted index) and "relevant_ids" (where the value is a
+    set of the relevant ids for this query).
     >>> ii = InvertedIndex()
     >>> ii.read_from_file("example.tsv", b=0.75, k=1.75, verbose=False)
     >>> benchmark = read_benchmark("example-benchmark.tsv")
-    >>> measures, evaluation = evaluate(ii, benchmark, verbose=False)
-    >>> [round(x, 3) for x in measures["mean"]]
+    >>> evaluation = evaluate(ii, benchmark, verbose=False)
+    >>> [round(x, 3) for x in evaluation["mean"]["precision"]]
     [0.667, 0.833, 0.694]
     >>> evaluation["animated film"]["result_ids"]
     [2, 4, 1]
     >>> sorted(list(evaluation["animated film"]["relevant_ids"]))
     [1, 3, 4]
-    >>> [round(x, 3) for x in measures["animated film"]]
+    >>> [round(x, 3) for x in evaluation["animated film"]["precision"]]
     [0.667, 0.667, 0.389]
     """
     evaluation = {}
-    measures = {}
     sum_p_at_3 = 0
     sum_p_at_r = 0
     sum_ap = 0
@@ -96,8 +95,8 @@ def evaluate(ii, benchmark, verbose=True):
         if verbose:
             print("  AP: %.2f" % ap)
 
-        measures[query] = [p_at_3, p_at_r, ap]
-        evaluation[query] = {"result_ids": result_ids,
+        evaluation[query] = {"precision": [p_at_3, p_at_r, ap],
+                             "result_ids": result_ids,
                              "relevant_ids": relevant_ids}
 
     # Compute MP@3.
@@ -106,14 +105,14 @@ def evaluate(ii, benchmark, verbose=True):
     mp_at_r = sum_p_at_r / num_queries
     # Compute MAP.
     map_value = sum_ap / num_queries
-    measures["mean"] = [mp_at_3, mp_at_r, map_value]
+    evaluation["mean"] = {"precision": [mp_at_3, mp_at_r, map_value]}
     if verbose:
         print("Mean results:")
-        print("  MP@3: %s" % round(measures["mean"][0], 3))
-        print("  MP@R: %s" % round(measures["mean"][1], 3))
-        print("  MAP:  %s" % round(measures["mean"][2], 3))
+        print("  MP@3: %s" % round(mp_at_3, 3))
+        print("  MP@R: %s" % round(mp_at_r, 3))
+        print("  MAP:  %s" % round(map_value, 3))
 
-    return measures, evaluation
+    return evaluation
 
 
 def precision_at_k(result_ids, relevant_ids, k):
@@ -163,7 +162,12 @@ def average_precision(result_ids, relevant_ids):
 
 
 def main(precomputed_file, benchmark_file):
-    # Create a new inverted index from the given file.
+    """
+    Evaluate a precomputed inverted index on a benchmark.
+    Save the evaluation results in a pickle file in a dictionary (see
+    "evaluate" for more information).
+    """
+    # Create the precomputed inverted index from the given file.
     print("Reading from file '%s'..." % precomputed_file)
     index = pickle.load(open(precomputed_file, "rb"))
 
@@ -172,13 +176,12 @@ def main(precomputed_file, benchmark_file):
     benchmark = read_benchmark(benchmark_file)
 
     # Evaluate the the inverted index against the benchmark.
-    measures, evaluation = evaluate(index, benchmark)
+    evaluation = evaluate(index, benchmark)
 
     new_name = (benchmark_file.replace("input", "output")
                               .replace(".tsv", "_")) + "evaluation.pkl"
     print(f"Saving evaluation data as {new_name}.")
-    pickle.dump({"evaluation": evaluation,
-                 "measures": measures},
+    pickle.dump(evaluation,
                 open(new_name, "wb"))
 
 

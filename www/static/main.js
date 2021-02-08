@@ -1,8 +1,15 @@
-function showHide(divID) {
-  var x = document.getElementById(divID);
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
+$(document).ready(function() {
+
+  $("#topResHeader").on("click", function() {
+    $("#topRes").slideToggle();
+  });
+
+  $("#inListHeader").on("click", function() {
+    $("#inList").slideToggle();
+  });
+
+  $("#notInListHeader").on("click", function() {
+    $("#notInList").slideToggle();
+  });
+
+});

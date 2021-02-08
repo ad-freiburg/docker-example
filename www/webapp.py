@@ -18,34 +18,26 @@ def home():
     user_input = request.args
     params = {}
     if "details" in user_input:
+
         query = user_input["details"]
-        relevant_ids = evaluation[query]["relevant_ids"]
-        num_relevant = len(relevant_ids)
-        result_ids = evaluation[query]["result_ids"]
-        relevant_in_res = []
-        other_relevant = []
-        for i in relevant_ids:
-            if i in result_ids:
-                # doc ids are 1-based
-                relevant_in_res.append((docs[i - 1], result_ids.index(i) + 1))
+
+        # Split the relevant documents into "in result" and "not in result".
+        relevant = {"in results": [], "not in res": []}
+        for i in evaluation[query]["relevant_ids"]:
+            if i in evaluation[query]["result_ids"]:
+                relevant["in results"].append(i)
             else:
-                other_relevant.append(docs[i - 1])
-        relevant_in_res.sort(key=lambda x: x[1])
-        top_results = []
-        counter = 0
-        for i in result_ids[:100]:
-            if i in relevant_ids:
-                top_results.append([docs[i - 1], "black"])
-                counter += 1
-                if counter == num_relevant:
-                    break
-            else:
-                top_results.append([docs[i - 1], "red"])
+                relevant["not in res"].append(i)
+
+        # Remove the entry, if there are no relevant titles not in the result.
+        if relevant["not in res"] == []:
+            relevant.pop("not in res")
+
         params["query"] = query
-        params["top_results"] = top_results
-        params["relevant_in_res"] = relevant_in_res
-        params["other_relevant"] = other_relevant
-        params["num_relevant"] = num_relevant
+        params["result_ids"] = evaluation[query]["result_ids"]
+        params["relevant"] = relevant
+        params["num_rel"] = len(evaluation[query]["relevant_ids"])
+        params["docs"] = docs
     return render_template("index.html",
                            measures=measures,
                            **params)
@@ -67,9 +59,13 @@ if __name__ == "__main__":
  for the webapp; should be the container port you published to the docker host
  (default: %(default)s)""")
     args = parser.parse_args()
-    eva_file = pickle.load(open(args.evaluation_file, "rb"))
-    evaluation = eva_file["evaluation"]
-    measures = eva_file["measures"]
+    evaluation = pickle.load(open(args.evaluation_file, "rb"))
+
+    # This should be removed soon!!
+    measures = dict()
+    for query in evaluation:
+        measures[query] = evaluation[query]["precision"]
+
     docs = []
     with open(args.doc_file, "r", encoding="utf-8") as f:
         for line in f:

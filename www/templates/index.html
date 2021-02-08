@@ -8,105 +8,141 @@
     <meta name="contact" content="klumppt@cs.uni-freiburg.de">
     <title>Docker Example</title>
     <link rel="stylesheet" href="../static/style.css">
-    <script src="../static/main.js"></script>
+    <script type="text/javascript">
+        var numQueries = {{ measures|length }} - 1
+    </script>
+    <script type="text/javascript" src="../static/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="../static/main.js"></script>
   </head>
   <body>
+    <!-- TITLE -->
     <div id="titlebox">
       <h1>Inverted Index Evaluation</h1>
     </div>
-    <div id="pagebox">
+    <!-- OVERVIEW -->
+    <div id="overviewbox">
       <p> This is the evaluation of the inverted index in the docker example.
       Each line represents a query in the benchmark.
       To get details about a query, click on it in the overview table below.
       </p>
-      <table>
-        <tr>
-          <th title="Keywords entered for this query">Query</th>
-          <th title="Precision at 3">P@3</th>
-          <th title="Precision at R">P@R</th>
-          <th title="Average Precision">AP</th>
-        </tr>
-        {% for query in measures %}
-          {% if query != "mean" %}
-            <tr>
-	      <td><a href="?details={{query}}" class="hidelink">{{ query }}</a></td>
-              <td>{{ "%0.2f" % measures[query][0] }}</td>
-              <td>{{ "%0.2f" % measures[query][1] }}</td>
-              <td>{{ "%0.2f" % measures[query][2] }}</td>
-            </tr>
-          {% endif %}
-        {% endfor %}
-        <tr>
-          <th>mean</th>
-          <th>{{ "%0.2f" % measures["mean"][0] }}</th>
-          <th>{{ "%0.2f" % measures["mean"][1] }}</th>
-          <th>{{ "%0.2f" % measures["mean"][2] }}</th>
-        </tr>
+      <table class="overview">
+
+        <thead>
+          <tr>
+            <th title="Keywords entered for this query">Keyword Query</th>
+            <th title="Precision at 3">P@3</th>
+            <th title="Precision at R">P@R</th>
+            <th title="Average Precision">AP</th>
+          </tr>
+        </thead>
+
+	<tbody>
+          {% for query in measures %}
+            {% if query != "mean" %}
+              <tr>
+	        <td><a href="?details={{query}}" class="hidelink">{{ query }}</a></td>
+                <td>{{ "%0.2f" % measures[query][0] }}</td>
+                <td>{{ "%0.2f" % measures[query][1] }}</td>
+                <td>{{ "%0.2f" % measures[query][2] }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+	</tbody>
+
+	<tfoot>
+          <tr>
+            <th>mean</th>
+            <th>{{ "%0.2f" % measures["mean"][0] }}</th>
+            <th>{{ "%0.2f" % measures["mean"][1] }}</th>
+            <th>{{ "%0.2f" % measures["mean"][2] }}</th>
+          </tr>
+	</tfoot>
+
       </table>
     </div>
+    <!-- DETAILS -->
     {% if query %}
     <div id="detailsbox">
 
       <h2>Query: {{ query }}</h2>
-      <p>Total number of relevant documents: {{ num_relevant }}</p>
+      <p>Total number of relevant documents: {{ num_rel }}</p>
       <span><b>P@3</b> = {{ "%0.5f" % measures[query][0] }}, </span>
-      <span><b>P@R</b> = <b>P@{{ num_relevant }}</b> = {{ "%0.5f" % measures[query][1] }}, </span>
+      <span><b>P@R</b> = <b>P@{{ num_rel }}</b> = {{ "%0.5f" % measures[query][1] }}, </span>
       <span><b>AP</b> = {{ "%0.5f" % measures[query][2] }} </span>
-      <p>Click on any of the points below to show/hide...</p>
+      <h3>Click on any of the points below to show/hide...</h3>
 
-      <h3 onclick="showHide('topRes')" class="hideshow"> ...top documents in the result list</h3>
+      <h3 id="topResHeader" class="clickable"> ...top documents in the result list</h3>
       <div id="topRes" style="display: none;">
         <p>
           Documents highlighted in
           <span style="color: red">red</span>
           are not relevant to the query according to the ground truth in the benchmark.
         </p>
-        <table>
-          <tr>
-            <th> </th>
-            <th> Document title </th>
-          </tr>
-          {% for title, color in top_results %}
+        <table class="scroll two-cols">
+          <thead>
             <tr>
-              <td> {{ loop.index0 + 1 }} </td>
-              <td style="color: {{color}};">{{title}}</td>
+              <th> Position in result </th>
+              <th> Document title </th>
             </tr>
-          {% endfor %}
+          </thead>
+	  <tbody>
+            {% for i in range([100, result_ids|length]|min) %}
+              <tr>
+                <td> {{ i + 1 }} </td>
+		{% if result_ids[i] in relevant["in results"] %}
+                  <td> {{docs[result_ids[i] - 1]}} </td>
+		{% else %}
+                  <td style="color: red;"> {{docs[result_ids[i] - 1]}} </td>
+		{% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
         </table>
       </div>
-      <h3 onclick="showHide('inList')" class="hideshow">...relevant documents in the result list (total: {{relevant_in_res|length}})</h3>
+      <h3 id="inListHeader" class="clickable">...relevant documents in the result list (total: {{ relevant["in results"]|length }})</h3>
       <div id="inList" style="display: none;">
-        <table>
-          <tr>
-            <th>Document title</th>
-            <th>Position in result</th>
-          </tr>
-          {% for title, position in relevant_in_res %}
-          <tr>
-            <td>{{title}}</td>
-            <td>{{position}}</td>
-          </tr>
-          {% endfor %}
+        <table class="scroll two-cols">
+          <thead>
+            <tr>
+              <th> Position in result </th>
+              <th> Document title </th>
+            </tr>
+          </thead>
+	  <tbody>
+            {% for id in result_ids %}
+              {% if id in relevant["in results"] %}
+                <tr>
+                  <td> {{loop.index0 + 1}} </td>
+                  <td> {{docs[id - 1]}} </td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
         </table>
       </div>
 
-      {% if other_relevant %}
-        <h3 onclick="showHide('notInList')" class="hideshow">...relevant documents <i>not</i> in the result list (total: {{other_relevant|length}})</h3>
+      {% if "not in res" in relevant %}
+      <h3 id="notInListHeader" class="clickable">...relevant documents <i>not</i> in the result list (total: {{ relevant["not in res"]|length }})</h3>
         <div id="notInList" style="display: none;">
-          <table>
-            <tr>
-              <th>Document title</th>
-            </tr>
-            {% for title in other_relevant %}
-            <tr>
-              <td>{{title}}</td>
-            </tr>
-            {% endfor %}
+          <table class="scroll one-col">
+            <thead>
+              <tr>
+                <th> Document title </th>
+              </tr>
+            </thead>
+	    <tbody>
+              {% for id in relevant["not in res"] %}
+                <tr>
+                  <td> {{docs[id - 1]}} </td>
+                </tr>
+              {% endfor %}
+            </tbody>
           </table>
         </div>
       {% endif %}
 
     </div>
     {% endif %}
+
   </body>
 </html>
