@@ -1,81 +1,51 @@
+/* General settings */
 body {
   background: #F3F3F3;
   font-family: Helvetica, arial, sans-serif;
 }
 
-div#overviewbox, div#titlebox, div#detailsbox{
+div#overviewbox, div#titlebox, div#detailsbox {
   background: white;
   font-size: 85%;
   border: 0.1em solid #A0A0A0;
-  width: 66em;
+  width: 45em;
   padding: 1em 1em 0.6em;
   margin: 0.5em auto 0.5em;
 }
 
-.clickable {
-  cursor: pointer;
-}
+/* Clickable elements should have a pointer. */
+.clickable, .clickable-row { cursor: pointer; }
 
-a.hidelink {
-  color: black;
-  text-decoration: none;
-}
+.clickable-row:hover td { background-color: #DDDDAA; }
 
-a:hover, .clickable:hover {
-  opacity: 0.5;
-}
+a:hover, .clickable:hover { opacity: 0.5; }
 
-/* Tables */
+/* Table settings */
 
 table {
-  border-collapse: collapse;
   width: 100%;
+  border-spacing: 0.2em
 }
 
-td, th {
-  text-align: left;
-  padding: 0.5em;
-}
+table thead th { background-color: #A6A6A6; padding: 0.3em; }
+table tbody td { background-color: #F3F3F3; padding: 0.3em; }
+table tfoot td { background-color: #A6A6A6; padding: 0.3em; }
 
-th {
-  background-color: #A6A6A6;
-}
+/* Change the background color of the row currently selected. */
+.selected td { background-color: #EEEEAA; }
 
-td {
-  background-color: #F3F3F3;
-  border: 2px solid white;
-}
+/* We need the following settings for the scrollbar. However, we apply them
+ * to all tables for a consistent look. */
+table, tbody, thead, tfoot { display: block; }
+table tr { display: table; width: 100%; }
 
-.overview td, .overview th { text-align: center; }
-.overview td:nth-child(1) { text-align: left; }
-.overview th:nth-child(1) { text-align: left; }
+/* Apply the same constant width to the last 3 columns of the overview table.  */
+.overview td, .overview th { width: 4em; text-align:center; }
+.overview td:nth-child(1), .overview th:nth-child(1) {width: auto; text-align: left; }
 
-.scroll th {
-  padding: 0.5em 1.5em 0.5em;
-}
+/* Settings for scrollable tables. Set last column width to auto for alignment
+ * of the table head with the table body. */
+.scroll tbody { max-height: 17em; overflow-y: auto; }
 
-.scroll tbody {
-  display: block;
-  max-height: 30em;
-  overflow-y: auto;
-}
-
-.scroll tbody td,
-.scroll tbody>tr>td {
-  float: left;
-}
-
-.scroll tr {
-  display: block;
-}
-
-.two-cols td:nth-child(1) { width: 10%; text-align: center; }
-.two-cols td:nth-child(2) { width: 85%; }
-
-.two-cols th:nth-child(1) { width: 10%; text-align: center; }
-.two-cols th:nth-child(2) { width: 85%; }
-
-.one-col th {
-  display: block;
-}
-.one-col td { width: 97%; }
+.scroll td:nth-child(1), .scroll th:nth-child(1) { width: 7em; text-align:center; }
+.scroll td:nth-child(2), .scroll th:nth-child(2) { width: auto; text-align: left; }

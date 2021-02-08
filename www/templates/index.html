@@ -9,7 +9,7 @@
     <title>Docker Example</title>
     <link rel="stylesheet" href="../static/style.css">
     <script type="text/javascript">
-        var numQueries = {{ measures|length }} - 1
+      var query = "{{query|replace(" ", "_")}}";
     </script>
     <script type="text/javascript" src="../static/jquery-3.5.1.js"></script>
     <script type="text/javascript" src="../static/main.js"></script>
@@ -37,13 +37,13 @@
         </thead>
 
 	<tbody>
-          {% for query in measures %}
-            {% if query != "mean" %}
-              <tr>
-	        <td><a href="?details={{query}}" class="hidelink">{{ query }}</a></td>
-                <td>{{ "%0.2f" % measures[query][0] }}</td>
-                <td>{{ "%0.2f" % measures[query][1] }}</td>
-                <td>{{ "%0.2f" % measures[query][2] }}</td>
+          {% for entry in measures %}
+            {% if entry != "mean" %}
+	    <tr id="{{ entry|replace(" ", "_") }}" class="clickable-row" data-href="?details={{entry}}">
+	        <td>{{ entry }}</td>
+                <td>{{ "%0.2f" % measures[entry][0] }}</td>
+                <td>{{ "%0.2f" % measures[entry][1] }}</td>
+                <td>{{ "%0.2f" % measures[entry][2] }}</td>
               </tr>
             {% endif %}
           {% endfor %}
@@ -51,10 +51,10 @@
 
 	<tfoot>
           <tr>
-            <th>mean</th>
-            <th>{{ "%0.2f" % measures["mean"][0] }}</th>
-            <th>{{ "%0.2f" % measures["mean"][1] }}</th>
-            <th>{{ "%0.2f" % measures["mean"][2] }}</th>
+            <td>mean</td>
+            <td>{{ "%0.2f" % measures["mean"][0] }}</td>
+            <td>{{ "%0.2f" % measures["mean"][1] }}</td>
+            <td>{{ "%0.2f" % measures["mean"][2] }}</td>
           </tr>
 	</tfoot>
 
@@ -71,7 +71,8 @@
       <span><b>AP</b> = {{ "%0.5f" % measures[query][2] }} </span>
       <h3>Click on any of the points below to show/hide...</h3>
 
-      <h3 id="topResHeader" class="clickable"> ...top documents in the result list</h3>
+      {% set show_max = [100, result_ids|length]|min %}
+      <h3 id="topResHeader" class="clickable"> ...top {{ show_max}} documents in the result list</h3>
       <div id="topRes" style="display: none;">
         <p>
           Documents highlighted in
@@ -86,7 +87,7 @@
             </tr>
           </thead>
 	  <tbody>
-            {% for i in range([100, result_ids|length]|min) %}
+            {% for i in range(show_max) %}
               <tr>
                 <td> {{ i + 1 }} </td>
 		{% if result_ids[i] in relevant["in results"] %}
