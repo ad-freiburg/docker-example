@@ -20,6 +20,16 @@ div#overviewbox, div#titlebox, div#detailsbox {
 
 a:hover, .clickable:hover { opacity: 0.5; }
 
+/* The clickable title above the three details tables. */
+.table-title {
+  font-size: larger;
+  font-weight: bold;
+  background-color: #F3F3F3;
+  text-align: center;
+  padding: 0.3em;
+  margin: 1em 0em 0.2em;
+}
+
 /* Table settings */
 
 table {
@@ -47,5 +57,5 @@ table tr { display: table; width: 100%; }
  * of the table head with the table body. */
 .scroll tbody { max-height: 17em; overflow-y: auto; }
 
-.scroll td:nth-child(1), .scroll th:nth-child(1) { width: 7em; text-align:center; }
+.scroll td:nth-child(1), .scroll th:nth-child(1) { width: 4em; text-align:center; }
 .scroll td:nth-child(2), .scroll th:nth-child(2) { width: auto; text-align: left; }

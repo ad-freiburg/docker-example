@@ -38,6 +38,7 @@ def home():
         params["relevant"] = relevant
         params["num_rel"] = len(evaluation[query]["relevant_ids"])
         params["docs"] = docs
+        params["descriptions"] = descriptions
     return render_template("index.html",
                            measures=measures,
                            **params)
@@ -61,16 +62,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
     evaluation = pickle.load(open(args.evaluation_file, "rb"))
 
-    # This should be removed soon!!
     measures = dict()
     for query in evaluation:
         measures[query] = evaluation[query]["precision"]
 
     docs = []
+    descriptions = []
     with open(args.doc_file, "r", encoding="utf-8") as f:
         for line in f:
-            line = line.strip()
-            docs.append(line.split("\t")[0])
+            line = line.split("\t")
+            docs.append(line[0].strip())
+            descriptions.append(line[1].strip())
     print("\nThe webapp is available at '<host>:<port>', where <host> is the "
           "local computer address and <port> is the port you mapped to the "
           "container port.\n")
