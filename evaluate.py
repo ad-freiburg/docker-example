@@ -129,12 +129,12 @@ if __name__ == "__main__":
         benchmark. The expected format of the file is one query per line,
         with the ids of all documents relevant for that query, like:
         <query>TAB<id1>WHITESPACE<id2>WHITESPACE<id3> ...""")
-    parser.add_argument("-b", type=float, nargs="*",
+    parser.add_argument("-b", type=float, nargs="+",
                         default=[DEFAULT_B, 0.0, 0.0], help="""
         The b from the BM25 formula.
         Enter a list of floats to run the evaluation with different parameters.
         (default: %(default)s)""")
-    parser.add_argument("-k", type=float, nargs="*",
+    parser.add_argument("-k", type=float, nargs="+",
                         default=[DEFAULT_K, 0.0, float("inf")], help="""
         The k from the BM25 formula.
         Enter a list of floats to run the evaluation with different parameters.

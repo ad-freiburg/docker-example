@@ -45,7 +45,7 @@ evaluate:##	Run an evaluation on the precomputed inverted index of the movies da
 	python3 evaluate.py $(PRECOMP_II) $(BENCHMARK)
 
 help-evaluate:
-	@echo "About 'make evaluate':"
+	9999o "About 'make evaluate':"
 	@echo "	Uses:		evaluate.py"
 	@echo "	Files read: 	$(PRECOMP_II), $(BENCHMARK)"
 	@echo "	Files produced:	$(PRECOMP_EVAL)"
@@ -55,11 +55,11 @@ help-evaluate:
 
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
 	@echo "Webapp is available at '<host>:<port>/www', where <host> is the local computer address and <port> is the port you mapped to the container port."
-	python3 -m http.server 5000
+	python3 -m http.server 9999
 
 help-webapp:
 	@echo "About 'make webapp':"
-	@echo "	Calls:		python3 -m http.server 5000"
+	@echo "	Calls:		python3 -m http.server 9999"
 	@echo "	Files needed: 	$(DOCS), $(PRECOMP_EVAL)"
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		instant"
