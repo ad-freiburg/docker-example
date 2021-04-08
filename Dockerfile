@@ -5,9 +5,9 @@ COPY requirements.txt bashrc ./
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN mkdir docker-example
-WORKDIR /docker-example
+WORKDIR docker-example
 COPY *.py example.tsv example-benchmark.tsv Makefile README.md ./
-COPY www/ ./www/
+COPY www/*.html www/*.js www/*.css www/*.md ./www/
 CMD ["/bin/bash", "--rcfile", "/bashrc"]
 
 # docker build -t docker-example .

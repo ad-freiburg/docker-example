@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="copyright" content="2020 University of Freiburg">
+    <meta name="copyright" content="Chair of Algorithms and Data Structures">
+    <meta name="author" content="Theresa Klumpp">
+    <meta name="contact" content="klumppt@cs.uni-freiburg.de">
+    <title>Reproducibility Example</title>
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- Showdown for displaying README.md to HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.4.0/showdown.min.js"></script>
+
+    <!-- Own stuff -->
+    <link rel="stylesheet" href="index.css">
+    <script type="text/javascript" src="index.js"></script>
+  </head>
+  <body>
+
+    <!-- TITLE -->
+    <div id="titlebox">
+      <h1>Inverted Index Evaluation</h1>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="README.md" class="readme">README</a>
+      <div class="readme"></div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div id="overviewbox">
+		  <h2>Overview</h2>
+      <p>
+      	Each line in the table below represents a mode with different values for k and b in the BM25 formula.
+      	To show more details about a mode, click on the corresponding row to select it.
+				You can select multiple rows to compare their details.
+				Click again to hide the details for the mode of the corresponding row.
+				Each table header provides a tooltip with a short explanation about that table column.
+      </p>
+      <table id="overviewTable" class="overview">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+		<!-- DETAILS -->
+		<div id="detailsbox">
+			<h2>Details</h2>
+			<p>
+				This is the details view.
+				You can see one table for each mode you selected above.
+				The table lists all keyword queries from the evaluation.
+				To show the ranking of the results for a specific query, click on the corresponing row.
+			</p>
+			<div id="details"></div>
+		</div>
+
+		<!-- QUERIES -->
+		<div id="resultsbox">
+		  <h2>Result Details</h2>
+			<div id="results"></div>
+		</div>
+
+  </body>
+</html>

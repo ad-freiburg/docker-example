@@ -1,0 +1,53 @@
+/* General settings */
+body {
+  background: #F3F3F3;
+  font-family: Helvetica, arial, sans-serif;
+}
+
+div#overviewbox, div#titlebox, div#detailsbox, div#resultsbox {
+  background: white;
+  font-size: 85%;
+  border: 0.1em solid #A0A0A0;
+  width: 62em;
+  padding: 1em;
+  margin: 0.5em auto 0.5em;
+}
+
+div#resultsbox { padding-bottom: 5em; }
+
+h1 { display: inline-block; }
+
+/* Change cursor to pointer for clickable elements. */
+.clickable { cursor: pointer; }
+
+/* The movies that do not occur in the ground truth are marked */
+.wrong { color: red; }
+
+/* Table settings */
+
+/* General settings */
+table { width: 100%; border-spacing: 0.2em }
+
+/* Color and text style */
+table thead th { background-color: #A6A6A6; padding: 0.3em; }
+table tbody td { background-color: #F3F3F3; padding: 0.3em; }
+table tfoot td { background-color: #D3D3D3; padding: 0.3em; font-weight: bold; }
+
+/* Alignment */
+table td, table th { text-align: right; }
+.details td:nth-child(1), .details th:nth-child(1) { text-align: left; }
+.overview th:nth-child(1), .overview td:nth-child(1), .overview th:nth-child(2) { text-align: center; }
+.overview td:nth-child(3) { text-align: left; }
+
+/* Mark the currently hovered row. */
+table tbody tr:hover td, .likeHovering td { background-color: #DDDDAA; }
+
+/* Change the background color of selected rows. */
+.selected td { background-color: #EEEEAA; }
+
+/* Scrollable Results table */
+.results, .results tbody, .results thead, .results tfoot { display: block; }
+.results tr { display: table; width: 100%; }
+.results tbody { max-height: 25em; overflow-y: auto; }
+.results td, .results th { width:  4em; text-align: center; }
+.results td:last-child, .results th:last-child { width: auto; text-align: left; }

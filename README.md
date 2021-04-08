@@ -24,7 +24,7 @@ Here is a list of tips and features you can learn in this example on top of the 
   + To make a port available to services outside of Docker, we can use the `-p` flag.
     The command `-p <host_port>:<container_port>` publishes `<container_port>` to the outside world and maps it to `<host_port>` on your machine.
     In a nutshell: Anything you now run on `<container_port>` inside the docker container is available on `<host_port>` outside of Docker.
-  + The fact that Docker forgets your history of commands every time you start/stop a container, can be quiet annoying.
+  + The fact that Docker forgets your history of commands every time you start/stop a container, can be quite annoying.
     With a simple trick that you can see in this example, you can make docker remember your bash history.
     Create an empty file `.docker_bash_history` and mount it to `/root/.bash_history` with the -v flag.
     This means that your bash history is mounted to a file outside the container and is therefore saved after leaving the container.

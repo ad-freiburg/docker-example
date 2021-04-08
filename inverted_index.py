@@ -25,70 +25,59 @@ class InvertedIndex:
         """
         Creates an empty inverted index.
         """
-        self.inverted_lists = {}  # The inverted lists.
+        self.inverted_lists = {}  # The inverted lists with term frequencies.
         self.docs = []  # The docs, each in form (title, description).
         self.doc_lengths = []  # The document lengths (= number of words).
+        self.n = 0  # The total number of documents.
+        self.avdl = 0  # The average document length.
 
-    def read_from_file(self, file_name, b=None, k=None, verbose=True):
+    def read_from_file(self, file_name, verbose=True):
         """
         Construct the inverted index from the given file. The expected format
         of the file is one document per line, in the format
         <title>TAB<description>. Each entry in the inverted list associated to
-        a word should contain a document id and a BM25 score. Compute the BM25
-        scores as follows:
+        a word should contain a document id and a term frequency score.
 
-        (1) In a first pass, compute the inverted lists with tf scores (that
-            is the number of occurrences of the word within the <title> and the
-            <description> of a document). Further, compute the document length
-            (DL) for each document (that is the number of words in the <title>
-            and the <description> of a document). Afterwards, compute the
-            average document length (AVDL).
-        (2) In a second pass, iterate each inverted list and replace the tf
-            scores by BM25 scores, defined as:
-            BM25 = tf * (k+1) / (k * (1 - b + b * DL/AVDL) + tf) * log2(N/df),
-            where N is the total number of documents and df is the number of
-            documents that contains the word.
+        Compute the inverted lists with tf scores (that is the number of
+        occurrences of the word within the <title> and the <description> of a
+        document). Further, compute the document length (DL) for each document
+        (that is the number of words in the <title> and the <description> of a
+        document). Afterwards, compute the average document length (AVDL).
 
         On reading the file, use UTF-8 as the standard encoding. To split the
-        texts into words, use the method introduced in the lecture. Make sure
-        that you ignore empty words.
+        texts into words, use the method introduced in the IR lecture. Make
+        sure that you ignore empty words.
 
         >>> ii = InvertedIndex()
         >>> ii.read_from_file("example.tsv",
-        ...                   b=0,
-        ...                   k=float("inf"),
         ...                   verbose=False)
-        >>> inv_lists = sorted(ii.inverted_lists.items())
-        >>> [(w, [(i, '%.3f' % tf) for i, tf in l]) for w, l in inv_lists]
+        >>> sorted(ii.inverted_lists.items())
         ... # doctest: +NORMALIZE_WHITESPACE
-        [('animated', [(1, '0.415'), (2, '0.415'), (4, '0.415')]),
-         ('animation', [(3, '2.000')]),
-         ('film', [(2, '1.000'), (4, '1.000')]),
-         ('movie', [(1, '0.000'), (2, '0.000'), (3, '0.000'), (4, '0.000')]),
-         ('non', [(2, '2.000')]),
-         ('short', [(3, '1.000'), (4, '2.000')])]
-
-        >>> ii = InvertedIndex()
-        >>> ii.read_from_file("example.tsv", b=0.75, k=1.75, verbose=False)
-        >>> inv_lists = sorted(ii.inverted_lists.items())
-        >>> [(w, [(i, '%.3f' % tf) for i, tf in l]) for w, l in inv_lists]
-        ... # doctest: +NORMALIZE_WHITESPACE
-        [('animated', [(1, '0.459'), (2, '0.402'), (4, '0.358')]),
-         ('animation', [(3, '2.211')]),
-         ('film', [(2, '0.969'), (4, '0.863')]),
-         ('movie', [(1, '0.000'), (2, '0.000'), (3, '0.000'), (4, '0.000')]),
-         ('non', [(2, '1.938')]),
-         ('short', [(3, '1.106'), (4, '1.313')])]
+        [('animated', [(1, 1), (2, 1), (4, 1)]),
+         ('animation', [(3, 1)]),
+         ('film', [(2, 1), (4, 1)]),
+         ('movie', [(1, 2), (2, 1), (3, 1), (4, 1)]),
+         ('non', [(2, 1)]),
+         ('short', [(3, 1), (4, 2)])]
+        >>> ii.n
+        4
+        >>> ii.avdl
+        3.75
+        >>> ii.doc_lengths
+        [3, 4, 3, 5]
         """
-
-        b = DEFAULT_B if b is None else b
-        k = DEFAULT_K if k is None else k
 
         # First pass: Compute (1) the inverted lists with tf scores and (2) the
         # document lengths.
         with open(file_name, "r", encoding="utf-8") as f:
             doc_id = 0
             for line in f:
+
+                # Store the doc as a tuple (title, description).
+                # Do this before line.strip, because some docs are missing the
+                # description (but still have the TAB).
+                self.docs.append(tuple(x.strip() for x in line.split("\t")))
+
                 line = line.strip()
 
                 dl = 0  # Compute the document length (number of words).
@@ -117,9 +106,6 @@ class InvertedIndex:
                         # The doc was not already seen, set tf to 1.
                         self.inverted_lists[word].append((doc_id, 1))
 
-                # Store the doc as a tuple (title, description).
-                self.docs.append(tuple(line.split("\t")))
-
                 # Register the document length.
                 self.doc_lengths.append(dl)
 
@@ -129,31 +115,16 @@ class InvertedIndex:
                               end="\r")
 
         # Compute N (the total number of documents).
-        n = len(self.docs)
+        self.n = len(self.docs)
 
         if verbose:
-            print(f"Progress: Read {n:6} documents.")
+            print(f"Progress: Read {self.n:6} documents.")
 
         # Compute AVDL (the average document length).
-        avdl = sum(self.doc_lengths) / n
+        self.avdl = sum(self.doc_lengths) / self.n
 
-        # Second pass: Iterate the inverted lists and replace the tf scores by
-        # BM25 scores, defined as follows:
-        # BM25 = tf * (k + 1) / (k * (1 - b + b * DL / AVDL) + tf) * log2(N/df)
-        for word, inverted_list in self.inverted_lists.items():
-            for i, (doc_id, tf) in enumerate(inverted_list):
-                # Obtain the document length (dl) of the document.
-                dl = self.doc_lengths[doc_id - 1]  # doc_id is 1-based.
-                # Compute alpha = (1 - b + b * DL / AVDL).
-                alpha = 1 - b + (b * dl / avdl)
-                # Compute tf2 = tf * (k + 1) / (k * alpha + tf).
-                tf2 = tf * (1 + (1 / k)) / (alpha + (tf / k)) if k > 0 else 1
-                # Compute df (that is the length of the inverted list).
-                df = len(self.inverted_lists[word])
-                # Compute the BM25 score = tf' * log2(N/df).
-                inverted_list[i] = (doc_id, tf2 * math.log(n / df, 2))
-
-    def merge(self, list1, list2):
+    @staticmethod
+    def merge(list1, list2):
         """
         Compute the union of the two given inverted lists in linear time
         (linear in the total number of entries in the two lists), where the
@@ -198,29 +169,59 @@ class InvertedIndex:
 
         return result
 
-    def process_query(self, keywords):
+    def process_query(self, keywords, k=None, b=None):
         """
-        Process the given keyword query as follows: Fetch the inverted list for
-        each of the keywords in the query and compute the union of all lists.
-        Sort the resulting list by BM25 scores in descending order.
+        Process the given keyword query as follows: Fetch the inverted list
+        with the term frequencies for each of the keywords in the query.
+        Compute the BM25 scores with the given k and b. Then compute the union
+        of all lists. Sort the resulting list by BM25 scores in descending
+        order.
 
         >>> ii = InvertedIndex()
         >>> ii.inverted_lists = {
-        ... "foo": [(1, 0.2), (3, 0.6)],
-        ... "bar": [(1, 0.4), (2, 0.7), (3, 0.5)],
-        ... "baz": [(2, 0.1)]}
-        >>> result = ii.process_query(["foo", "bar"])
-        >>> [(id, "%.1f" % tf) for id, tf in result]
-        [(3, '1.1'), (2, '0.7'), (1, '0.6')]
+        ... "foo": [(1, 1), (3, 2)],
+        ... "bar": [(1, 1), (2, 3), (3, 1)],
+        ... "baz": [(2, 1)]}
+        >>> ii.avdl = 3
+        >>> ii.n = 3
+        >>> ii.doc_lengths = [3, 4, 2]
+        >>> result = ii.process_query(["foo", "bar"], k=0, b=0)
+        >>> [(id, "%.2f" % tf) for id, tf in result]
+        [(1, '0.58'), (3, '0.58')]
+        >>> result = ii.process_query(["foo", "bar"], k=float("inf"), b=0)
+        >>> [(id, "%.2f" % tf) for id, tf in result]
+        [(3, '1.17'), (1, '0.58')]
         """
+
+        b = DEFAULT_B if b is None else b
+        k = DEFAULT_K if k is None else k
+
         if not keywords:
             return []
 
-        # Fetch the inverted lists for each of the given keywords.
+        # Fetch the inverted lists with the term frequencies for each of the
+        # given keywords and compute the BM25 scores, defined as follows:
+        # BM25 = tf * (k + 1) / (k * (1 - b + b * DL / AVDL) + tf) * log2(N/df)
         lists = []
         for keyword in keywords:
-            if keyword in self.inverted_lists:
-                lists.append(self.inverted_lists[keyword])
+
+            if keyword not in self.inverted_lists:
+                continue
+
+            # Compute df (that is the length of the inverted list).
+            df = len(self.inverted_lists[keyword])
+            idf = math.log(self.n / df, 2)
+            bm25_lists = []
+            for doc_id, tf in self.inverted_lists[keyword]:
+                # Obtain the document length (dl) of the document.
+                dl = self.doc_lengths[doc_id - 1]  # doc_id is 1-based.
+                # Compute alpha = (1 - b + b * DL / AVDL).
+                alpha = 1 - b + (b * dl / self.avdl)
+                # Compute tf2 = tf * (k + 1) / (k * alpha + tf).
+                tf2 = tf * (1 + (1 / k)) / (alpha + (tf / k)) if k > 0 else 1
+                # Compute the BM25 score = tf2 * log2(N/df).
+                bm25_lists.append((doc_id, tf2 * idf))
+            lists.append(bm25_lists)
 
         # Compute the union of all inverted lists.
         if len(lists) == 0:
@@ -236,7 +237,7 @@ class InvertedIndex:
         # Sort the postings by BM25 scores, in descending order.
         return sorted(union, key=lambda x: x[1], reverse=True)
 
-    def render_output(self, postings, keywords, k=3):
+    def render_output(self, postings, keywords, num_res=3):
         """
         Render the output for the top-k of the given postings. Fetch the
         the titles and descriptions of the related docs and highlight the
@@ -248,7 +249,7 @@ class InvertedIndex:
         p = re.compile('\\b(' + '|'.join(keywords) + ')\\b', re.IGNORECASE)
 
         # Output at most k matching docs.
-        for i in range(min(len(postings), k)):
+        for i in range(min(len(postings), num_res)):
             doc_id, tf = postings[i]
             title, desc = self.docs[doc_id - 1]  # doc_id is 1-based.
 
@@ -266,12 +267,13 @@ class InvertedIndex:
         print("\n# total hits: %s." % len(postings))
 
 
-def main(file_name, b, k):
+def main(file_name):
     # Create a new inverted index from the given file.
-    print("Creating index with BM25 scores from file '%s'." % file_name)
+    print("Creating an inverted index from file '%s'." % file_name)
     ii = InvertedIndex()
-    ii.read_from_file(file_name, b=b, k=k)
+    ii.read_from_file(file_name)
 
+    # Save inverted index using pickle.
     new_name = (file_name.replace("input", "output")
                          .replace(".tsv", "_")) + "precomputed_ii.pkl"
     print("Saving index as '%s'." % new_name)
@@ -281,16 +283,11 @@ def main(file_name, b, k):
 if __name__ == "__main__":
     # Parse the command line arguments.
     parser = argparse.ArgumentParser(description="""Construct the inverted
-        index with BM25 scores from the given file. Save the inverted index
-        using pickle.""")
+        index with term frequency scores from the given file. Save the inverted
+        index using pickle.""")
     # Positional arguments
     parser.add_argument("doc_file", type=str, help="""File to read from. The
             expected format of the file is one document per line, in the format
             <title>TAB<description>.""")
-    # Optional arguments
-    parser.add_argument("-b", "--b", type=float, default=0.75, help="""b value
-            for the BM25 scores (default: %(default)s)""")
-    parser.add_argument("-k", "--k", type=float, default=1.75, help="""k value
-            for the BM25 scores (default: %(default)s)""")
     args = parser.parse_args()
-    main(args.doc_file, args.b, args.k)
+    main(args.doc_file)

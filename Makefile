@@ -1,5 +1,6 @@
 TEST_CMD = python3 -m doctest
 CHECKSTYLE_CMD = flake8
+DOCS = input/movies.tsv
 BENCHMARK = input/movies-benchmark.tsv
 PRECOMP_II = output/movies_precomputed_ii.pkl
 PRECOMP_EVAL = output/movies-benchmark_evaluation.pkl
@@ -14,13 +15,13 @@ help: Makefile
 
 index:	##	Create the inverted index from the movies dataset.
 ##		Note: This has been done already and the corresponding output file is already available.
-	python3 inverted_index.py input/movies.tsv -b 0.04 -k 0.7
+	python3 inverted_index.py $(DOCS)
 
 help-index:
 	@echo "About 'make index':"
 	@echo "	Uses:		inverted_index.py"
-	@echo "	Files read:	input/movies.tsv"
-	@echo "	Files produced:	output/movies_precomputed_ii.pkl"
+	@echo "	Files read:	$(DOCS)"
+	@echo "	Files produced:	$(PRECOMP_II)"
 	@echo "	~Time: 		< 1 min (for 44MB file)"
 	@echo "For more usage information about 'inverted_index.py', call it with the '-h' flag."
 	@echo "For more background information (in particular file formats), look at the section 'Creating an Inverted Index' in the README.md."
@@ -31,9 +32,9 @@ query:	##	Query the precomputed invertex index of the movies dataset.
 help-query:
 	@echo "About 'make query':"
 	@echo "	Uses:		query.py"
-	@echo "	Files read: 	output/movies_precomputed_ii.pkl"
+	@echo "	Files read: 	$(PRECOMP_II)"
 	@echo "	Files produced:	None"
-	@echo "	~Time: 		a few seconds to load the inverted index (~140MB)"
+	@echo "	~Time: 		a few seconds to load the inverted index (~89MB)"
 	@echo "For more usage information about 'query.py', call it with the '-h' flag."
 	@echo "For more background information (in particular file formats), look at the section 'Keyword search on the Inverted Index' in the README.md."
 
@@ -46,22 +47,23 @@ evaluate:##	Run an evaluation on the precomputed inverted index of the movies da
 help-evaluate:
 	@echo "About 'make evaluate':"
 	@echo "	Uses:		evaluate.py"
-	@echo "	Files read: 	output/movies_precomputed_ii.pkl, input/movies-benchmark.tsv"
-	@echo "	Files produced:	output/movies-benchmark_evaluation.pkl"
-	@echo "	~Time: 		a few seconds to load the ii (~140MB) plus < 1 sec per query for most queries."
+	@echo "	Files read: 	$(PRECOMP_II), $(BENCHMARK)"
+	@echo "	Files produced:	$(PRECOMP_EVAL)"
+	@echo "	~Time: 		a few seconds to load the ii (~89MB) plus < 1 sec per query for most queries."
 	@echo "For more usage information about 'evaluate.py', call it with the '-h' flag."
 	@echo "For more background information (in particular file formats), look at the section 'Evaluating the Inverted Index' in the README.md."
 
 webapp:	##	Build a webapp that contains an evaluation of the movies benchmark.
-	python3 www/webapp.py input/movies.tsv $(PRECOMP_EVAL)
+	@echo "Webapp is available at '<host>:<port>/www', where <host> is the local computer address and <port> is the port you mapped to the container port."
+	python3 -m http.server 5000
 
 help-webapp:
 	@echo "About 'make webapp':"
-	@echo "	Uses:		www/webapp.py"
-	@echo "	Files read: 	output/movies-benchmark_evaluation.pkl"
+	@echo "	Calls:		python3 -m http.server 5000"
+	@echo "	Files needed: 	$(DOCS), $(PRECOMP_EVAL)"
 	@echo "	Files produced:	None"
 	@echo "	~Time: 		instant"
-	@echo "For more usage information about 'webapp.py', call it with the '-h' flag."
+	@echo "Webapp will be available at '<host>:<port>/www', where <host> is the local computer address and <port> is the port you mapped to the container port."
 	@echo "For more background information (in particular file formats), look at the section 'Building the webapp' in the README.md."
 
 check:	#	Test and run checkstyle.
