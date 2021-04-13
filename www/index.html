@@ -32,13 +32,7 @@
     <!-- OVERVIEW -->
     <div id="overviewbox">
 		  <h2>Overview</h2>
-      <p>
-      	Each line in the table below represents a mode with different values for k and b in the BM25 formula.
-      	To show more details about a mode, click on the corresponding row to select it.
-				You can select multiple rows to compare their details.
-				Click again to hide the details for the mode of the corresponding row.
-				Each table header provides a tooltip with a short explanation about that table column.
-      </p>
+      <p id="overviewParagraph"></p>
       <table id="overviewTable" class="overview">
         <thead>
         </thead>
@@ -62,6 +56,10 @@
 		<!-- QUERIES -->
 		<div id="resultsbox">
 		  <h2>Result Details</h2>
+			<p id="resultsParagraph"></p>
+			<p>
+				Show non-relevant movies <input type="checkbox" id="showRelevant" onclick="displayResultTable()" checked>
+			</p>
 			<div id="results"></div>
 		</div>
 
