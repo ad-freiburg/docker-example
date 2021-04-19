@@ -2,9 +2,21 @@
 var moviesPath = '../input/movies.tsv'
 var evaluationPath = '../output/movies-benchmark_evaluation.tsv'
 
-// Global variables containing the evaluation data
+// An array with one entry for each movie. Each entry consists of a pair
+// containing (1) the title and (2) a description.
 var movies = [];
+
+// A dictionary with an entry for each query in the benchmark, where the
+// key is a string containing the query and the value is an array containing
+// the ground truth results.
 var groundTruth = {};
+
+// An array with one entry for each mode. Each entry is a dictionary. This
+// dictionary contains the keys "k" and "b", where the value is the value
+// for k and b, respectively, from the BM25 score.
+// Moreover, it contains one entry for each query in the benchmark, where the
+// key is a string containing the query and the value is an array containing
+// the results and the order this mode returned.
 var evaluation = [];
 
 // These will be arrays with one entry for each mode.
@@ -355,9 +367,10 @@ function displayResultTable() {
     + 'There are <b>' + groundTruth[currentlyShowingQuery].length + ' relevant movies</b> for this query. '
     + 'Movies that do not occur in the ground truth and are therefore not relevant are '
     + '<span class="wrong">highlighted</span>. '
-    + 'You can sort the table by the ranking of a different mode by clicking on the corresponding header.';
+    + 'You can sort the table by the ranking of a different mode by clicking on the corresponding header. '
+    + 'Each movie title provides a tooltip with the description of the movie.';
   $('#resultsParagraph').html(explanation);
-  $('div#results').html('<table id="resultTable" class="results"><thead></thead><tbody></tbody></table>');
+  $('div#results').html('<table id="resultTable" class="results scrollable"><thead></thead><tbody></tbody></table>');
   var head = $('<tr>');
   for (mode = 0; mode < evaluation.length; mode++) {
     var properties = {
@@ -377,6 +390,7 @@ function displayResultTable() {
   appendRowsToResultTable();
   makeResultTableScrollable();
   makeTableSortable();
+  displayRelevantNotInResults();
 }
 
 function makeResultTableScrollable() {
@@ -460,4 +474,36 @@ function makeTableSortable() {
     displayResultTable();
     console.log("Sorting by mode ", (eval(currentlyShowingMode + "+1")));
   });
+}
+
+function displayRelevantNotInResults() {
+  notInResults = [];
+  results = evaluation[currentlyShowingMode][currentlyShowingQuery];
+  gt = groundTruth[currentlyShowingQuery]
+  for (movieId of gt) {
+    if (! results.includes(movieId)) {
+      notInResults.push(movieId);
+    }
+  }
+  if (notInResults.length == 0) {
+    p = '<p>There are no relevant movies that are not in the results for mode #' + eval(currentlyShowingMode + '+1') +'.</p>';
+    $('div#notInResults').html(p);
+  } else {
+    p = notInResults.length + ' relevant movies that did not occur in the results for mode #' + eval(currentlyShowingMode + '+1');
+    $('div#notInResults').html('<br><br>');
+    var table = $('<table>', { class: 'scrollable notInRes' });
+    var thead = $('<thead>');
+    var row = $('<tr>');
+    row.append($('<th>', { text: p }));
+    thead.append(row);
+    table.append(thead);
+    var tbody = $('<tbody>');
+    for (movieId of notInResults) {
+      row = $('<tr>');
+      row.append($('<td>', { text: movies[movieId - 1][0], title: movies[movieId - 1][1] }));
+      tbody.append(row);
+    }
+    table.append(tbody);
+    $('div#notInResults').append(table);
+  }
 }

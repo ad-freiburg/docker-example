@@ -45,14 +45,17 @@ table tbody tr:hover td, .hoverLook td { background-color: #DDDDAA; }
 /* Change the background color of selected rows. */
 .selected td { background-color: #EEEEAA; }
 
-/* Scrollable Results table */
-.results, .results tbody, .results thead, .results tfoot { display: block; }
-.results tr { display: table; width: 100%; }
-.results tbody { max-height: 25em; overflow-y: auto; }
+/* Scrollable tables */
+.scrollable, .scrollable tbody, .scrollable thead, .scrollable tfoot { display: block; }
+.scrollable tr { display: table; width: 100%; }
+.scrollable tbody { max-height: 25em; overflow-y: auto; }
+
 .results td, .results th { width:  4em; text-align: center; }
 .results td:last-child, .results th:last-child { width: auto; text-align: left; }
 
-/* Arrows ... TODO */
+.notInRes td, .notInRes th { text-align: center; }
+
+/* Arrow showing which mode the results table is sorted by */
 .currentlySortedBy:after {
   content: '';
   position: relative;
