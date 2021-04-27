@@ -59,7 +59,7 @@ def evaluate(ii, benchmark, k, b, verbose=True):
     return res
 
 
-def main(precomputed_file, benchmark_file, k_list, b_list):
+def main(precomputed_file, benchmark_file, output_path, k_list, b_list):
     """
     Evaluate a precomputed inverted index on a benchmark.
     Save the evaluation results in a pickle file in a dictionary (see
@@ -83,9 +83,7 @@ def main(precomputed_file, benchmark_file, k_list, b_list):
         run = [k, b] + list(evaluate(ii, benchmark, k=k, b=b).values())
         evaluation.append(run)
 
-    new_name = (benchmark_file.replace("input", "output")
-                              .replace(".tsv", "_evaluation.tsv"))
-    print(f"Saving evaluation data as {new_name}.")
+    print(f"Saving evaluation data as {output_path}.")
 
     # Create header.
     header = ["k", "b"]
@@ -97,7 +95,7 @@ def main(precomputed_file, benchmark_file, k_list, b_list):
     for query in benchmark:
         gt.append(list(benchmark[query]))
 
-    with open(new_name, "wt") as f:
+    with open(output_path, "wt") as f:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
         writer.writerow(header)
         for mode in evaluation:
@@ -122,6 +120,7 @@ if __name__ == "__main__":
         b=0 and k=inf (normal tf.idf).
         """)
 
+    # Positional arguments
     parser.add_argument("precomputed_file", type=str, help="""Pickle file
         containing a precomputed inverted index. To generate such a file,
         use 'inverted_index.py'.""")
@@ -129,6 +128,11 @@ if __name__ == "__main__":
         benchmark. The expected format of the file is one query per line,
         with the ids of all documents relevant for that query, like:
         <query>TAB<id1>WHITESPACE<id2>WHITESPACE<id3> ...""")
+
+    # Optional arguments
+    parser.add_argument("-o", "--output", type=str, help="""Path of the output
+            file. By default, it is saved in the output folder with the base
+            name of the benchmark file + '_evaluation.tsv'""")
     parser.add_argument("-b", type=float, nargs="+",
                         default=[DEFAULT_B, 0.0, 0.0], help="""
         The b from the BM25 formula.
@@ -147,7 +151,15 @@ if __name__ == "__main__":
             message="Need the same number of arguments for b and k, " +
                     f"but got {len(args.b)} for b and {len(args.k)} for k.\n")
 
+    if args.output is not None:
+        output_path = args.output
+    else:
+        output_path = (args.benchmark_file.replace("input", "output")
+                                          .replace(".tsv", "") +
+                       "_evaluation.tsv")
+
     main(args.precomputed_file,
          args.benchmark_file,
+         output_path,
          k_list=args.k,
          b_list=args.b)

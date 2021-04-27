@@ -267,17 +267,15 @@ class InvertedIndex:
         print("\n# total hits: %s." % len(postings))
 
 
-def main(file_name):
+def main(file_name, output_path):
     # Create a new inverted index from the given file.
     print("Creating an inverted index from file '%s'." % file_name)
     ii = InvertedIndex()
     ii.read_from_file(file_name)
 
     # Save inverted index using pickle.
-    new_name = (file_name.replace("input", "output")
-                         .replace(".tsv", "_")) + "precomputed_ii.pkl"
-    print("Saving index as '%s'." % new_name)
-    pickle.dump(ii, open(new_name, "wb"))
+    print("Saving index as '%s'." % output_path)
+    pickle.dump(ii, open(output_path, "wb"))
 
 
 if __name__ == "__main__":
@@ -289,5 +287,17 @@ if __name__ == "__main__":
     parser.add_argument("doc_file", type=str, help="""File to read from. The
             expected format of the file is one document per line, in the format
             <title>TAB<description>.""")
+    # Optional arguments
+    parser.add_argument("-o", "--output", type=str, help="""Path of the output
+            file. By default, it is saved in the output folder with the base
+            name of the document file + '_precomputed_ii.pkl'""")
     args = parser.parse_args()
-    main(args.doc_file)
+
+    if args.output is not None:
+        output_path = args.output
+    else:
+        output_path = (args.doc_file.replace("input", "output")
+                                    .replace(".tsv", "") +
+                       "_precomputed_ii.pkl")
+
+    main(args.doc_file, output_path)

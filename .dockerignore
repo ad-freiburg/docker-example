@@ -1,0 +1,7 @@
+Dockerfile
+.dockerignore
+README.md
+__pycache__
+**/*.swp
+**/*.git
+**/*.svn

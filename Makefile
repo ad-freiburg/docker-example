@@ -3,7 +3,7 @@ CHECKSTYLE_CMD = flake8
 DOCS = input/movies.tsv
 BENCHMARK = input/movies-benchmark.tsv
 PRECOMP_II = output/movies_precomputed_ii.pkl
-PRECOMP_EVAL = output/movies-benchmark_evaluation.pkl
+PRECOMP_EVAL = output/movies-benchmark_evaluation.tsv
 
 help: Makefile
 	@echo "You are most likely to be interested in using 'make <target>', where <target> is one of the following:"
@@ -15,7 +15,7 @@ help: Makefile
 
 index:	##	Create the inverted index from the movies dataset.
 ##		Note: This has been done already and the corresponding output file is already available.
-	python3 inverted_index.py $(DOCS)
+	python3 inverted_index.py -o $(PRECOMP_II) $(DOCS)
 
 help-index:
 	@echo "About 'make index':"
@@ -42,10 +42,10 @@ evaluate:##	Run an evaluation on the precomputed inverted index of the movies da
 ##		in the console.
 ##		Note: The produced file is already available and a better representation of the evaluation
 ##		is available through the webapp.
-	python3 evaluate.py $(PRECOMP_II) $(BENCHMARK)
+	python3 evaluate.py $(PRECOMP_II) $(BENCHMARK) -o $(PRECOMP_EVAL)
 
 help-evaluate:
-	9999o "About 'make evaluate':"
+	@echo "About 'make evaluate':"
 	@echo "	Uses:		evaluate.py"
 	@echo "	Files read: 	$(PRECOMP_II), $(BENCHMARK)"
 	@echo "	Files produced:	$(PRECOMP_EVAL)"
@@ -68,9 +68,7 @@ help-webapp:
 
 check:	#	Test and run checkstyle.
 	$(TEST_CMD) *.py
-	$(TEST_CMD) www/*.py
 	$(CHECKSTYLE_CMD) *.py
-	$(CHECKSTYLE_CMD) www/*.py
 
 clean:	#	Remove auto-generated python files (pycache and .pyc files).
 	rm -f *.pyc www/*.pyc

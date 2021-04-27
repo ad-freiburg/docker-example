@@ -2,12 +2,10 @@ FROM python:3.8
 LABEL maintainer="Theresa Klumpp <klumppt@cs.uni-freiburg.de>"
 RUN apt-get update && apt-get install -y make vim bash-completion && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt bashrc ./
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 RUN mkdir repro-example
 WORKDIR repro-example
-COPY *.py example.tsv example-benchmark.tsv Makefile README.md ./
-COPY www/*.html www/*.js www/*.css www/*.md ./www/
+COPY . .
 CMD ["/bin/bash", "--rcfile", "/bashrc"]
 
 # docker build -t repro-example .

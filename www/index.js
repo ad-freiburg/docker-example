@@ -1,12 +1,18 @@
-/* File Paths */
+// File Paths
 const moviesPath = '../input/movies.tsv';
 const evaluationPath = '../output/movies-benchmark_evaluation.tsv';
 
-/* Number of entries table is appended by after reaching the bottom of a table with
-   lazy loading */
-const appendBy = 40;
+// Configuration variables
 
-/* Promise */
+// Number of decimal places shown for the precision values.
+const decimalPlaces = 3;
+// Threshold in the last column of the overview table. Should be between 0 and 1.
+const threshold = 0.5;
+// Number of rows appended after reaching the bottom of a table with lazy loading
+const appendBy = 50;
+
+/* Promise for reading the movies. Wait for this promise before building the
+   result details table. */
 const docsPromise = readDocs();
 
 /* An array with one entry for each movie. Each entry consists of a pair
@@ -40,19 +46,17 @@ $(document).ready(function() {
   $('div#detailsbox').hide();
   $('div#resultsbox').hide();
 
-  $('p#overviewParagraph').html('Loading data and computing results ...');
-  $('p#overviewParagraph').css('color', 'darkred');
-
   /* Read the evaluation file.
      Then, compute the precision measures for each mode and build the overview table. */
   readEvaluation().then(function() {
     fillOutPrecisions();
+    $('p#overviewWaitingMessage').remove();
     displayOverviewTable();
   });
                                                                          
-  // Click on README link should open dialog box which renders MD as HT  ML.
+  // Click on README link should open dialog box which renders MD as HTML.
   $("a.readme").click(function(e) {
-    // Prevent that the link is opened as it normally would in a browse  r.
+    // Prevent that the link is opened as it normally would in a browser.
     e.preventDefault();
     // The time is added to prevent caching.
     $.get($(this).attr("href") + "?_=" + new Date().getTime(), function  (markdown) {
@@ -89,19 +93,21 @@ function readDocs() {
 
 function readEvaluation() {
   return new Promise(function(resolve, reject) {
-    // Read and process the evaluation data.
+    /* Read and process the evaluation data. Look at an evaluation tsv-file to
+       fully understand how this file is being processed here. */
     $.get(evaluationPath, function(data) {
       // Get lines. Omit empty part after the last \n.
       let lines = data.split("\n").slice(0, -1);
       // The first line contains the headers ("k", "b" and the keyword queries).
       let header = lines[0].split("\t");
-      let body = lines.slice(1, -1);
       // The last line contains the ground truth.
       let gt = lines[lines.length - 1].split("\t");
       // Read the ground truth. Since there is no k or b, we start at i = 2.
       for (let i = 2; i < header.length; i++) {
         groundTruth[header[i]] = JSON.parse(gt[i]);
       }
+      // Process each mode in the evaluation.
+      let body = lines.slice(1, -1);
       $.each(body, function(index, line) {
         line = line.split("\t");
         let mode = {};
@@ -124,6 +130,8 @@ function readEvaluation() {
 }
 
 function fillOutPrecisions() {
+  /* Compute the measures precision at 3, precision at R and average precision
+     for each query of each mode. Store them globally. */
   $.each (evaluation, function(i, mode) {
     let pAt3 = {};
     let pAtR = {};
@@ -135,6 +143,7 @@ function fillOutPrecisions() {
         AP[query] = averagePrecision(mode[query], groundTruth[query]);
       }
     }
+    // Add the computed measures to the corresponding global variables.
     precisionsAt3.push(pAt3);
     precisionsAtR.push(pAtR);
     averagePrecisions.push(AP);
@@ -142,15 +151,6 @@ function fillOutPrecisions() {
 }
 
 function displayOverviewTable() {
-  // Explanatory paragraph
-  let explanation = 'Each line in the table below represents a mode with different values for k and b in the BM25 formula. ' +
-      'To show more details about a mode, click on the corresponding row to select it. ' +
-      'You can select multiple rows to compare their details. ' +
-      'Click again to hide the details for the mode of the corresponding row. ' +
-      'Each table header provides a tooltip with a short explanation about that table column. ';
-  $('#overviewParagraph').html(explanation);
-  $('#overviewParagraph').css('color', 'black');
-
   // Append head.
   let head = $('<tr>');
   head.append($('<th>', {
@@ -183,8 +183,8 @@ function displayOverviewTable() {
     title: 'Max Average Precision over all queries'
   }));
   head.append($('<th>', {
-    text: 'AP > 0.5',
-    title: 'The percentage of queries with Average Precision > 0.5'
+    text: 'AP > ' + threshold,
+    title: 'The percentage of queries with Average Precision > ' + threshold
   }));
   $('#overviewTable thead').append(head);
 
@@ -197,34 +197,27 @@ function displayOverviewTable() {
     row.append($('<td>', { text: parseInt(i) + 1 }));
     row.append($('<td>', { text: 'k = ' + evaluation[i].k }));
     row.append($('<td>', { text: 'b = ' + evaluation[i].b }));
-    row.append($('<td>', { text: getAverage(pAt3).toFixed(3) }));
-    row.append($('<td>', { text: getAverage(pAtR).toFixed(3) }));
-    row.append($('<td>', { text: getAverage(AP).toFixed(3) }));
-    row.append($('<td>', { text: Math.min(...AP).toFixed(3) }));
-    row.append($('<td>', { text: Math.max(...AP).toFixed(3) }));
-    row.append($('<td>', { text: getPercentageGreaterThan(AP, 0.5).toFixed(2) + ' %' }));
+    row.append($('<td>', { text: getAverage(pAt3).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: getAverage(pAtR).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: getAverage(AP).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: Math.min(...AP).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: Math.max(...AP).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: getPercentageGreaterThan(AP, threshold).toFixed(2) + ' %' }));
     $('#overviewTable tbody').append(row);
   }
 
   // Make rows clickable.
-  makeOverviewRowsClickable();
-}
-
-function makeOverviewRowsClickable() {
   $('.overview-row').click(function() {
-
     // Mark the currently selected row(s).
     $(this).toggleClass('selected');
-
     $('div#detailsbox').show();
-
     displayDetails();
   });
 }
 
 function precisionAtK(resultIds, relevantIds, k) {
   /* Compute the measure P@k for the given list of result ids as it was
-     returned by the inverted index for a single query, and the fiven set of
+     returned by the inverted index for a single query, and the given set of
      relevant document ids. */
   if (k == 0) { return 0; }
   let numRelevantResults = 0;
@@ -252,12 +245,15 @@ function averagePrecision(resultIds, relevantIds) {
 }
 
 function getAverage(array) {
+  // Compute the average of a given array.
   if (array.length == 0) { return 0; }
   let sum = array.reduce((a, b) => a + b, 0);
   return sum / array.length;
 }
 
 function getPercentageGreaterThan(array, threshold) {
+  /* Return the percentage of elements in the array that are greater than
+     the given threshold. */
   if (array.length == 0) { return 0; }
   let accepted = 0;
   for (let element of array) {
@@ -269,9 +265,7 @@ function getPercentageGreaterThan(array, threshold) {
 }
 
 function displayDetails() {
-  // Hide the results.
   $('div#resultsbox').hide();
-  // Empty the old details div.
   $('div#details').empty();
   // Add details (description and table) for each selected mode.
   $('.overview-row.selected').each(function() {
@@ -311,9 +305,9 @@ function displayDetails() {
           class: 'clickable query-row ' + query.replace(/ /g, '_')
         });
         row.append($('<td>', { text: query }));
-        row.append($('<td>', { text: precisionsAt3[index][query].toFixed(3) }));
-        row.append($('<td>', { text: precisionsAtR[index][query].toFixed(3) }));
-        row.append($('<td>', { text: averagePrecisions[index][query].toFixed(3) }));
+        row.append($('<td>', { text: precisionsAt3[index][query].toFixed(decimalPlaces) }));
+        row.append($('<td>', { text: precisionsAtR[index][query].toFixed(decimalPlaces) }));
+        row.append($('<td>', { text: averagePrecisions[index][query].toFixed(decimalPlaces) }));
         tbody.append(row);
       }
     }
@@ -322,9 +316,9 @@ function displayDetails() {
     let tfoot = $('<tfoot>');
     row = $('<tr>');
     row.append($('<td>', { text: 'Mean' }));
-    row.append($('<td>', { text: getAverage(Object.values(precisionsAt3[index])).toFixed(3) }));
-    row.append($('<td>', { text: getAverage(Object.values(precisionsAtR[index])).toFixed(3) }));
-    row.append($('<td>', { text: getAverage(Object.values(averagePrecisions[index])).toFixed(3) }));
+    row.append($('<td>', { text: getAverage(Object.values(precisionsAt3[index])).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: getAverage(Object.values(precisionsAtR[index])).toFixed(decimalPlaces) }));
+    row.append($('<td>', { text: getAverage(Object.values(averagePrecisions[index])).toFixed(decimalPlaces) }));
     tfoot.append(row);
     table.append(tfoot);
     $('div#details').append(table);
@@ -332,28 +326,20 @@ function displayDetails() {
   if ($('div#details').is(':empty')) {
     $('div#detailsbox').hide();
   } else {
-    makeDetailsRowsClickable();
+    // Make rows clickable.
+    $('.query-row').click(function() {
+      // Remove highlighting from other row, if there is one.
+      $('.query-row.selected').removeClass('selected');
+      $(this).addClass('selected');
+      $('div#resultsbox').show();
+      let chosenQuery;
+      let chosenMode;
+      [chosenQuery, chosenMode] = $(this).attr('id').split('-');
+      chosenQuery = chosenQuery.replace(/_/g, ' ');
+      displayResultTable(chosenQuery, chosenMode);
+    });
     checkForHovering();
   }
-}
-
-function makeDetailsRowsClickable() {
-  $('.query-row').click(function() {
-
-    // Mark only the currently selected row.
-    $('.query-row.selected').removeClass('selected');
-    $(this).addClass('selected');
-
-    $('div#resultsbox').show();
-
-    let chosenQuery;
-    let chosenMode;
-    [chosenQuery, chosenMode] = $(this).attr('id').split('-');
-    chosenQuery = chosenQuery.replace(/_/g, ' ');
-
-    displayResultTable(chosenQuery, chosenMode);
-
-  });
 }
 
 function checkForHovering() {
