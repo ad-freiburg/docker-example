@@ -2,6 +2,10 @@
 const moviesPath = '../input/movies.tsv';
 const evaluationPath = '../output/movies-benchmark_evaluation.tsv';
 
+/* Number of entries table is appended by after reaching the bottom of a table with
+   lazy loading */
+const appendBy = 40;
+
 /* Promise */
 const docsPromise = readDocs();
 
@@ -28,12 +32,6 @@ let evaluation = [];
 let precisionsAt3 = [];
 let precisionsAtR = [];
 let averagePrecisions = [];
-
-/* Variables for the query and mode that is currently displayed in the result table. */
-let currentlyShowingQuery;
-let currentlyShowingMode;
-let n;  // Counter for where in the results array we currently are for the scrollable result table.
-const appendBy = 20;  // Number of entries table is appended by after reaching the bottom.
 
 // ============================================================================
 
@@ -348,10 +346,12 @@ function makeDetailsRowsClickable() {
 
     $('div#resultsbox').show();
 
-    [currentlyShowingQuery, currentlyShowingMode] = $(this).attr('id').split('-');
-    currentlyShowingQuery = currentlyShowingQuery.replace(/_/g, ' ');
+    let chosenQuery;
+    let chosenMode;
+    [chosenQuery, chosenMode] = $(this).attr('id').split('-');
+    chosenQuery = chosenQuery.replace(/_/g, ' ');
 
-    displayResultTable();
+    displayResultTable(chosenQuery, chosenMode);
 
   });
 }
@@ -371,10 +371,10 @@ function checkForHovering() {
   }
 }
 
-function displayResultTable() {
+function displayResultTable(chosenQuery, chosenMode) {
   let explanation = 'The table below shows the ranking of the results for the query <b>"' +
-      currentlyShowingQuery + '"</b>. ' +
-      'There are <b>' + groundTruth[currentlyShowingQuery].length + ' relevant movies</b> for this query. ' +
+      chosenQuery + '"</b>. ' +
+      'There are <b>' + groundTruth[chosenQuery].length + ' relevant movies</b> for this query. ' +
       'Movies that do not occur in the ground truth and are therefore not relevant are ' +
       '<span class="wrong">highlighted</span>. ' +
       'You can sort the table by the ranking of a different mode by clicking on the corresponding header. ' +
@@ -391,53 +391,44 @@ function displayResultTable() {
       class: 'clickable sorting',
       id: 'sortByMode_' + mode
     };
-    if (mode == currentlyShowingMode) {
+    if (mode == chosenMode) {
       properties.class += ' currentlySortedBy';
     }
     head.append($('<th>', properties));
   }
   head.append($('<th>', { text: 'Movie Title' }));
   $('#resultTable thead').append(head);
-  n = 0;
   docsPromise.then(function() {
-    appendRowsToResultTable();
-    makeResultTableScrollable();
-    makeTableSortable();
-    displayRelevantNotInResults();
+    let resultsCounter = 0;
+    resultsCounter = appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode);
+    makeResultTableScrollable(resultsCounter, chosenQuery, chosenMode);
+    makeTableSortable(chosenQuery, chosenMode);
+    displayRelevantNotInResults(chosenQuery, chosenMode);
+    // Turn off old click event first and then create a new click event.
+    $('#showRelevant').off().on('click', function() { displayResultTable(chosenQuery, chosenMode); });
   });
 }
 
-function makeResultTableScrollable() {
-  $('#resultTable tbody').scroll(function() {
-    let scrollTop = Math.round($(this).scrollTop());
-    let bodyHeight = parseInt($(this).css('height'));
-    let scrollHeight = $(this).prop('scrollHeight');
-    let scrollPrec = Math.round(100 * scrollTop / (scrollHeight - bodyHeight));
-    if (scrollPrec == 100) {
-      appendRowsToResultTable();
-    }
-  });
-}
-
-function appendRowsToResultTable() {
+function appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode) {
   if ($('#showRelevant').is(':checked')) {
-    appendRows();
+    return appendRows(resultsCounter, chosenQuery, chosenMode);
   } else {
-    appendOnlyRelevant();
+    return appendOnlyRelevant(resultsCounter, chosenQuery, chosenMode);
   }
 }
 
-function appendOnlyRelevant() {
-  let results = evaluation[currentlyShowingMode][currentlyShowingQuery];
-  let counter = 0;
-  while (n < results.length) {
-    let movieId = results[n];
-    if (groundTruth[currentlyShowingQuery].includes(movieId)) {
-      counter++;
+function appendOnlyRelevant(resultsCounter, chosenQuery, chosenMode) {
+  let results = evaluation[chosenMode][chosenQuery];
+  let inList = 0;
+  while (resultsCounter < results.length) {
+    let movieId = results[resultsCounter];
+    resultsCounter++;
+    if (groundTruth[chosenQuery].includes(movieId)) {
+      inList++;
       let row = $('<tr>');
       for (let mode = 0; mode < evaluation.length; mode++) {
         // Check if the movieId is in the result of mode. (Will be -1 if not found.)
-        let pos = evaluation[mode][currentlyShowingQuery].indexOf(movieId);
+        let pos = evaluation[mode][chosenQuery].indexOf(movieId);
         if (pos != -1) {
           row.append($('<td>', { text: pos + 1 }));
         } else {
@@ -446,22 +437,22 @@ function appendOnlyRelevant() {
       }
       row.append($('<td>', { text: movies[movieId - 1][0], title: movies[movieId - 1][1] }));
       $('#resultTable tbody').append(row);
-    if (counter == appendBy) { break; }
+    if (inList == appendBy) { break; }
     }
-    n++;
   }
+  return resultsCounter;
 }
 
-function appendRows() {
+function appendRows(resultsCounter, chosenQuery, chosenMode) {
   // Append rows beginning from row k and ending with row n.
-  let results = evaluation[currentlyShowingMode][currentlyShowingQuery];
-  let end = Math.min(n + appendBy, results.length);
-  for (let i = n; i < end; i++) {
+  let results = evaluation[chosenMode][chosenQuery];
+  let end = Math.min(resultsCounter + appendBy, results.length);
+  for (let i = resultsCounter; i < end; i++) {
     let movieId = results[i];
     let row = $('<tr>');
     for (let mode = 0; mode < evaluation.length; mode++) {
       // Check if the movieId is in the result of mode. (Will be -1 if not found.)
-      let pos = evaluation[mode][currentlyShowingQuery].indexOf(movieId);
+      let pos = evaluation[mode][chosenQuery].indexOf(movieId);
       if (pos != -1) {
         row.append($('<td>', { text: pos + 1 }));
       } else {
@@ -472,26 +463,40 @@ function appendRows() {
       text: movies[movieId - 1][0],
       title: movies[movieId - 1][1]
     };
-    if (!groundTruth[currentlyShowingQuery].includes(movieId)) {
+    if (!groundTruth[chosenQuery].includes(movieId)) {
       properties.class = 'wrong';
     }
     row.append($('<td>', properties));
     $('#resultTable tbody').append(row);
   }
-  n = n + appendBy;
+  return resultsCounter + appendBy;
 }
 
-function makeTableSortable() {
-  $('.sorting').click(function() {
-    currentlyShowingMode = $(this).attr('id').split('_')[1];
-    displayResultTable();
+function makeResultTableScrollable(resultsCounter, chosenQuery, chosenMode) {
+  $('#resultTable tbody').scroll(function() {
+    let scrollTop = Math.round($(this).scrollTop());
+    let bodyHeight = parseInt($(this).css('height'));
+    let scrollHeight = $(this).prop('scrollHeight');
+    let scrollPrec = Math.round(100 * scrollTop / (scrollHeight - bodyHeight));
+    if (scrollPrec == 100) {
+      resultsCounter = appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode);
+    }
   });
 }
 
-function displayRelevantNotInResults() {
+function makeTableSortable(chosenQuery, chosenMode) {
+  $('.sorting').click(function() {
+    let newChosenMode = $(this).attr('id').split('_')[1];
+    if (newChosenMode != chosenMode) {
+      displayResultTable(chosenQuery, newChosenMode);
+    }
+  });
+}
+
+function displayRelevantNotInResults(chosenQuery, chosenMode) {
   let notInResults = [];
-  let results = evaluation[currentlyShowingMode][currentlyShowingQuery];
-  let gt = groundTruth[currentlyShowingQuery];
+  let results = evaluation[chosenMode][chosenQuery];
+  let gt = groundTruth[chosenQuery];
   for (let movieId of gt) {
     if (! results.includes(movieId)) {
       notInResults.push(movieId);
@@ -499,13 +504,13 @@ function displayRelevantNotInResults() {
   }
   if (notInResults.length == 0) {
     let p = '<p>There are no relevant movies that are not in the results for mode #' +
-      (parseInt(currentlyShowingMode) + 1) +
+      (parseInt(chosenMode) + 1) +
       '.</p>';
     $('div#notInResults').html(p);
   } else {
     let p = notInResults.length +
       ' relevant movies that did not occur in the results for mode #' +
-      (parseInt(currentlyShowingMode) + 1);
+      (parseInt(chosenMode) + 1);
     $('div#notInResults').html('<br><br>');
     let table = $('<table>', { class: 'scrollable notInRes' });
     let thead = $('<thead>');
