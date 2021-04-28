@@ -58,13 +58,14 @@ For more details, call each program with the '-h'-flag to get usage information.
 
 The program 'inverted_index.py' will create an inverted index from a given input file and serialize it using [Pickle](https://docs.python.org/3/library/pickle.html).
 
-Usage: `python3 inverted_index.py doc_file`
+Usage: `python3 inverted_index.py [-o OUTPUT] doc_file`
 
 The expected format of the input file is one document per line, in the format \<title\>TAB\<description\>.
 A file 'movies.tsv' in the expected format is available in '/nfs/students/repro-example/input'.
 It contains 107,769 movies with title and description.
 The program will automatically save the inverted index using [Pickle](https://docs.python.org/3/library/pickle.html).
-The output file will have the same base name, appended by 'precomputed_ii.pkl'
+Optionally, you can enter your own output file path via the -o flag.
+Otherwise, the output file will have the same base name as the input file, appended by 'precomputed_ii.pkl'
 
 *Note: Since building an inverted index takes a long time, a file ('movies_precomputed_ii.pkl') with a precomputed inverted index is already available in '/nfs/students/repro-example/output'.
 This means you do not have to run this program on the movies dataset.*
@@ -108,9 +109,10 @@ For example, if you want to run the evaluation in two modes; first, with k=0.4 a
 
 The default uses three modes: binary (k=0, b=0), standard setting for BM25 (k=1.75, b=0.75) and normal tf.idf (k=inf, b=0).
 The program automatically saves the data of the evaluation as a tsv-file.
-The output file will have the same base name as the benchmark file, appended by 'evaluation.tsv'.
+Optionally, you can enter your own output file path via the -o flag.
+Otherwise, the output file will have the same base name as the benchmark file, appended by 'evaluation.tsv'
 
-*Note: Since evaluating an inverted index takes a long time, a file ('movies-benchmark_evaluation.tsv') with a precomouted evaluation on the three default modes is already available in '/nfs/students/repro-example/output'.
+*Note: Since evaluating an inverted index takes a long time (in theory), a file ('movies-benchmark_evaluation.tsv') with a precomouted evaluation on the three default modes is already available in '/nfs/students/repro-example/output'.
 This means you do not have to run this program on the movies dataset unless you would like to evaluate a different mode.*
 
 ## Building the webapp
@@ -123,7 +125,7 @@ You need the following files available in order to run the webapp properly:
 + ./output/movies-benchmark_evaluation.tsv (a tsv file as produced by 'evaluate.py')
 
 Both files are available in the NFS folder.
-If you are using docker/wharfer (and you should!), they are mounted to the expected directory, if you used the commands above.
+If you are using docker/wharfer (and you should!), they are mounted to the expected directory, if you used the provided commands.
 You can then build the webapp:
 
 Usage: `python3 -m http.server <port>`
