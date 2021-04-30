@@ -62,7 +62,15 @@
 		<!-- QUERIES -->
 		<div id="resultsbox">
 		  <h2>Result Details</h2>
-			<p id="resultsParagraph"></p>
+			<p>
+			  The table below shows the ranking of the results for the query
+				<span id=thisQuery style="font-weight: bold"></span>.
+        There are <b><span id=numRelMovies></span> relevant movies</b> for this query.
+        Movies that do not occur in the ground truth and are therefore not relevant are
+				<span class="wrong">highlighted</span>.
+        You can sort the table by the ranking of a different mode by clicking on the corresponding header.
+        Each movie title provides a tooltip with the description of the movie.
+			</p>
 			<p>
 				Show non-relevant movies <input type="checkbox" id="showRelevant" checked>
 			</p>

@@ -326,6 +326,7 @@ function displayDetails() {
   if ($('div#details').is(':empty')) {
     $('div#detailsbox').hide();
   } else {
+
     // Make rows clickable.
     $('.query-row').click(function() {
       // Remove highlighting from other row, if there is one.
@@ -338,34 +339,29 @@ function displayDetails() {
       chosenQuery = chosenQuery.replace(/_/g, ' ');
       displayResultTable(chosenQuery, chosenMode);
     });
-    checkForHovering();
-  }
-}
 
-function checkForHovering() {
-  for (let query in groundTruth) {
-    if (groundTruth.hasOwnProperty(query)) {
-      query = query.replace(/ /g, '_');
-      $('.' + query).hover(
-        function() {
-          $('.' + query).addClass('hoverLook');
-        }, function() {
-          $('.' + query).removeClass('hoverLook');
-        }
-      );
+    // Check for hovering
+    for (let query in groundTruth) {
+      if (groundTruth.hasOwnProperty(query)) {
+        query = query.replace(/ /g, '_');
+        $('.' + query).hover(
+          function() {
+            $('.' + query).addClass('hoverLook');
+          }, function() {
+            $('.' + query).removeClass('hoverLook');
+          }
+        );
+      }
     }
+
   }
 }
 
 function displayResultTable(chosenQuery, chosenMode) {
-  let explanation = 'The table below shows the ranking of the results for the query <b>"' +
-      chosenQuery + '"</b>. ' +
-      'There are <b>' + groundTruth[chosenQuery].length + ' relevant movies</b> for this query. ' +
-      'Movies that do not occur in the ground truth and are therefore not relevant are ' +
-      '<span class="wrong">highlighted</span>. ' +
-      'You can sort the table by the ranking of a different mode by clicking on the corresponding header. ' +
-      'Each movie title provides a tooltip with the description of the movie.';
-  $('#resultsParagraph').html(explanation);
+  // For paragraph above the table.
+  $('span#thisQuery').html(chosenQuery);
+  $('span#numRelMovies').html(groundTruth[chosenQuery].length);
+  // Build the table itself.
   $('div#results').html('<table id="resultTable" class="results scrollable"><thead></thead><tbody></tbody></table>');
   let head = $('<tr>');
   for (let mode = 0; mode < evaluation.length; mode++) {
@@ -387,8 +383,26 @@ function displayResultTable(chosenQuery, chosenMode) {
   docsPromise.then(function() {
     let resultsCounter = 0;
     resultsCounter = appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode);
-    makeResultTableScrollable(resultsCounter, chosenQuery, chosenMode);
-    makeTableSortable(chosenQuery, chosenMode);
+
+    // Make result table scrollable
+    $('#resultTable tbody').scroll(function() {
+      let scrollTop = Math.round($(this).scrollTop());
+      let bodyHeight = parseInt($(this).css('height'));
+      let scrollHeight = $(this).prop('scrollHeight');
+      let scrollPrec = Math.round(100 * scrollTop / (scrollHeight - bodyHeight));
+      if (scrollPrec == 100) {
+        resultsCounter = appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode);
+      }
+    });
+
+    // Make result table sortable
+    $('.sorting').click(function() {
+      let newChosenMode = $(this).attr('id').split('_')[1];
+      if (newChosenMode != chosenMode) {
+        displayResultTable(chosenQuery, newChosenMode);
+      }
+    });
+
     displayRelevantNotInResults(chosenQuery, chosenMode);
     // Turn off old click event first and then create a new click event.
     $('#showRelevant').off().on('click', function() { displayResultTable(chosenQuery, chosenMode); });
@@ -404,13 +418,16 @@ function appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode) {
 }
 
 function appendOnlyRelevant(resultsCounter, chosenQuery, chosenMode) {
+  /* Go over all results and append only the relevant ones.
+     Keep count of how many rows were appended and stop when "appendBy"
+     (which is a global const variable) rows are reached */
   let results = evaluation[chosenMode][chosenQuery];
-  let inList = 0;
+  let appendedCounter = 0;
   while (resultsCounter < results.length) {
     let movieId = results[resultsCounter];
     resultsCounter++;
     if (groundTruth[chosenQuery].includes(movieId)) {
-      inList++;
+      appendedCounter++;
       let row = $('<tr>');
       for (let mode = 0; mode < evaluation.length; mode++) {
         // Check if the movieId is in the result of mode. (Will be -1 if not found.)
@@ -423,14 +440,15 @@ function appendOnlyRelevant(resultsCounter, chosenQuery, chosenMode) {
       }
       row.append($('<td>', { text: movies[movieId - 1][0], title: movies[movieId - 1][1] }));
       $('#resultTable tbody').append(row);
-    if (inList == appendBy) { break; }
+    if (appendedCounter == appendBy) { break; }
     }
   }
   return resultsCounter;
 }
 
 function appendRows(resultsCounter, chosenQuery, chosenMode) {
-  // Append rows beginning from row k and ending with row n.
+  /* Append "appendBy" (which is a global const variable) rows beginning at
+     row "resultsCounter". */
   let results = evaluation[chosenMode][chosenQuery];
   let end = Math.min(resultsCounter + appendBy, results.length);
   for (let i = resultsCounter; i < end; i++) {
@@ -456,27 +474,6 @@ function appendRows(resultsCounter, chosenQuery, chosenMode) {
     $('#resultTable tbody').append(row);
   }
   return resultsCounter + appendBy;
-}
-
-function makeResultTableScrollable(resultsCounter, chosenQuery, chosenMode) {
-  $('#resultTable tbody').scroll(function() {
-    let scrollTop = Math.round($(this).scrollTop());
-    let bodyHeight = parseInt($(this).css('height'));
-    let scrollHeight = $(this).prop('scrollHeight');
-    let scrollPrec = Math.round(100 * scrollTop / (scrollHeight - bodyHeight));
-    if (scrollPrec == 100) {
-      resultsCounter = appendRowsToResultTable(resultsCounter, chosenQuery, chosenMode);
-    }
-  });
-}
-
-function makeTableSortable(chosenQuery, chosenMode) {
-  $('.sorting').click(function() {
-    let newChosenMode = $(this).attr('id').split('_')[1];
-    if (newChosenMode != chosenMode) {
-      displayResultTable(chosenQuery, newChosenMode);
-    }
-  });
 }
 
 function displayRelevantNotInResults(chosenQuery, chosenMode) {
